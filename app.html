@@ -1096,7 +1096,7 @@ window.rmSupabase=null;
 (function(){
   function getSession(){try{return JSON.parse(localStorage.getItem("villa_kids_session")||"null")}catch(e){return null}}
   var s=getSession();
-  if(!s||!s.nome||!s.role){location.replace("index.html?v=12");return;}
+  if(!s||!s.nome||!s.role){location.replace("index.html?v=15");return;}
   window.RECREAMOR_USUARIO_ATUAL=s;
   document.addEventListener("DOMContentLoaded",function(){
     try{
@@ -1119,7 +1119,7 @@ window.rmSupabase=null;
   },{once:true});
 })();
 </script><script id="villa-v12-account-actions">
-window.rmSair=function(){try{localStorage.removeItem("villa_kids_session")}catch(e){} location.replace("index.html?v=12")};
+window.rmSair=function(){try{localStorage.removeItem("villa_kids_session")}catch(e){} location.replace("index.html?v=15")};
 window.rmTrocarConta=window.rmSair;
 window.rmToggleUserMenu=function(e){if(e)e.stopPropagation();var d=document.getElementById("rmUserMenuDrop");if(d)d.classList.toggle("open")};
 </script>
@@ -1141,8 +1141,22 @@ body{background:linear-gradient(rgba(4,168,213,.92),rgba(4,168,213,.92)),url('./
  .rm-mobile-time{background:#e9fff1!important;color:#12823d!important;padding:6px 8px!important;border-radius:10px!important;font-weight:900!important;font-variant-numeric:tabular-nums}
 }
 </style>
+
+<style id="villa-kids-v15-cache-theme">
+html,body{background:#08a9d5!important;background-image:none!important}
+body{min-height:100vh!important;background:linear-gradient(180deg,#08a9d5 0%,#0796c5 100%)!important}
+.main,.rm-mobile-dashboard,.app{background:transparent!important}
+@media(max-width:767px){
+  body{background:linear-gradient(180deg,#08a9d5 0%,#0796c5 100%)!important;background-attachment:fixed!important}
+  .rm-mobile-dashboard{background:transparent!important}
+  .rm-mobile-date,.rm-mobile-search-wrap,.rm-mobile-child,.rm-mobile-tabs button{background:rgba(255,255,255,.97)!important}
+  .rm-mobile-time{display:inline-flex!important;align-items:center!important;justify-content:center!important;min-width:92px!important;background:#e9fff1!important;color:#12823d!important;border:1px solid #9be1b3!important;border-radius:999px!important;padding:7px 9px!important;font-size:13px!important;font-weight:900!important;font-variant-numeric:tabular-nums!important}
+}
+#villaVersionBadge{position:fixed;right:8px;bottom:8px;z-index:99999;background:#0754a6;color:#fff;padding:3px 7px;border-radius:999px;font:700 10px system-ui;opacity:.8;pointer-events:none}
+</style>
 </head>
 <body>
+<div id="villaVersionBadge">V15</div>
 
 
 
@@ -3398,7 +3412,7 @@ window.rmShowSessionDetails=function(id){
       const right=document.createElement('div');
       const t=document.createElement('div');
       t.className='rm-mobile-time';
-      t.textContent=elapsed(s);
+      t.textContent='⏱ '+elapsed(s);
       const more=document.createElement('button');
       more.className='rm-mobile-more';
       more.textContent='⋮';
