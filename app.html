@@ -1156,6 +1156,7 @@ body{min-height:100vh!important;background:linear-gradient(180deg,#08a9d5 0%,#07
 </style>
 </head>
 <body>
+<div class="villa-system-decor" aria-hidden="true"><span>☆</span><span>☁</span><span>☆</span><span>○</span><span>♢</span><span>☆</span><span>☁</span><span>☆</span></div>
 <div id="villaVersionBadge">V15</div>
 
 
@@ -2481,6 +2482,7 @@ function closeCashRegister(){
     cashOut:cashOut,
     movements:rmCashMovementsToday().map(x=>({...x})),
     childrenCount:rmCashChildrenCount(),
+    productsCount:(window.rmProductsQtyForViewedCash?rmProductsQtyForViewedCash():0),
     reopenedFrom:db.cash.reopenedFrom||null,
     expectedCash:expected,
     countedCash:counted,
@@ -5662,6 +5664,117 @@ document.addEventListener('DOMContentLoaded',function(){
   var card=document.querySelector('#rmKidsNowCard strong');if(card)card.textContent='🎠 Crianças no parquinho agora';
 });
 </script>
+
+
+<style id="villa-v16-system-theme">
+:root{--vk-blue:#08a8cf;--vk-navy:#064c9d;--vk-teal:#10a7b3;--vk-green:#78ad27;--vk-yellow:#f6b719;--vk-orange:#f05a18;--vk-pink:#ef4d88;--vk-purple:#6c3aa7}
+html,body{background:var(--vk-blue)!important}
+body{position:relative;isolation:isolate}
+.villa-system-decor{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;color:#fff;opacity:.12;font-size:58px;font-family:Arial,sans-serif}
+.villa-system-decor span{position:absolute;filter:grayscale(1)}
+.villa-system-decor span:nth-child(1){left:4%;top:8%}.villa-system-decor span:nth-child(2){right:6%;top:10%}.villa-system-decor span:nth-child(3){left:7%;top:43%}.villa-system-decor span:nth-child(4){right:7%;top:42%}.villa-system-decor span:nth-child(5){left:8%;bottom:9%}.villa-system-decor span:nth-child(6){right:9%;bottom:8%}.villa-system-decor span:nth-child(7){left:44%;top:7%}.villa-system-decor span:nth-child(8){left:50%;bottom:7%}
+.app,.main,.content,main{background:transparent!important}
+.sidebar{background:rgba(255,255,255,.96)!important;box-shadow:0 14px 34px rgba(0,78,126,.18)!important}
+.card,.dialog,.rm-welcome-card{background:rgba(255,255,255,.97)!important;box-shadow:0 12px 30px rgba(0,73,112,.14)!important;border:1px solid rgba(255,255,255,.55)!important}
+/* cada função com uma cor da marca */
+#entryModal .dialog-head,#entryModal h2{color:var(--vk-orange)!important}
+#customersModal .dialog-head,#customersModal h2,#customerHistoryModal .dialog-head{color:var(--vk-purple)!important}
+#pickerModal .dialog-head,#pickerModal h2{color:var(--vk-yellow)!important}
+#exitModal .dialog-head,#exitModal h2,#rmGroupExitModal .dialog-head{color:var(--vk-pink)!important}
+#productsModal .dialog-head,#productsModal h2{color:var(--vk-purple)!important}
+#saleModal .dialog-head,#saleModal h2{color:var(--vk-orange)!important}
+#cashModal .dialog-head,#cashModal h2{color:var(--vk-green)!important}
+#reportModal .dialog-head,#reportModal h2,#rmReportsModal .dialog-head{color:var(--vk-navy)!important}
+#rmEventsModal .dialog-head,#rmEventFormModal .dialog-head,#rmEventPaymentModal .dialog-head{color:var(--vk-pink)!important}
+#rmSettingsModal .dialog-head,#rmUsersSettingsModal .dialog-head,#rmPackagesSettingsModal .dialog-head{color:var(--vk-teal)!important}
+#entryModal .primary{background:linear-gradient(90deg,var(--vk-orange),#ff8a18)!important}
+#saleModal .primary{background:linear-gradient(90deg,var(--vk-orange),var(--vk-yellow))!important;color:#fff!important}
+#cashModal .primary{background:linear-gradient(90deg,var(--vk-teal),var(--vk-green))!important}
+#exitModal .primary,#rmGroupExitModal .primary{background:linear-gradient(90deg,var(--vk-pink),var(--vk-purple))!important}
+#productsModal .primary,#customersModal .primary{background:linear-gradient(90deg,var(--vk-purple),var(--vk-pink))!important}
+#reportModal .primary,#rmReportsModal .primary{background:linear-gradient(90deg,var(--vk-navy),var(--vk-teal))!important}
+.summary-line{border-radius:10px;padding:10px 12px!important;margin:4px 0;background:#f7fbfd}
+.summary-line:nth-child(4n+1){border-left:4px solid var(--vk-teal)}.summary-line:nth-child(4n+2){border-left:4px solid var(--vk-green)}.summary-line:nth-child(4n+3){border-left:4px solid var(--vk-yellow)}.summary-line:nth-child(4n){border-left:4px solid var(--vk-pink)}
+.table th,table th{color:var(--vk-navy)!important;background:#eaf8fb!important}
+.banner{background:#eaf9fb!important;color:#087f8a!important}
+@media(max-width:760px){.villa-system-decor{font-size:44px}.card,.dialog{backdrop-filter:none}}
+</style>
+<script id="villa-v16-cash-report">
+(function(){
+  function d(v){try{return new Date(v).toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'})}catch(e){return ''}}
+  function t(v){try{return new Date(v).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}catch(e){return ''}}
+  function safeMoney(v){try{return money(Number(v||0))}catch(e){return 'R$ '+Number(v||0).toFixed(2).replace('.',',')}}
+  window.rmFormatCashReport=function(c){
+    c=c||{};var x=c.totals||{}, mov=c.movements||[];
+    var lines=[
+      "FECHAMENTO DE CAIXA - VILLA KIDS PARQUE","",
+      "Data: "+d(c.closedAt||Date.now()),
+      "Responsável pelo caixa: "+(c.openedBy||"Não identificado"),
+      "Fechado por: "+(c.closedBy||"Não identificado"),
+      "Abertura: "+t(c.openedAt),"Fechamento: "+t(c.closedAt),"",
+      "RESUMO OPERACIONAL",
+      "Crianças lançadas: "+Number(c.childrenCount||0),
+      "Produtos vendidos: "+Number(c.productsCount||0),"",
+      "FORMAS DE PAGAMENTO",
+      "Pix: "+safeMoney(x.Pix),
+      "Dinheiro: "+safeMoney(x.Dinheiro),
+      "Débito: "+safeMoney(x['Débito']),
+      "Crédito: "+safeMoney(x['Crédito']),
+      "Cortesia: "+safeMoney(x.Cortesia),"",
+      "CONFERÊNCIA DO CAIXA",
+      "Fundo inicial: "+safeMoney(c.openingAmount),
+      "Faturamento bruto: "+safeMoney(c.revenue),
+      "Saídas em dinheiro: "+safeMoney(c.cashOut),
+      "Estornos: "+safeMoney(c.refunds),
+      "Dinheiro esperado: "+safeMoney(c.expectedCash),
+      "Dinheiro contado: "+safeMoney(c.countedCash),
+      "Diferença: "+safeMoney(c.difference)
+    ];
+    if(mov.length){lines.push('',"MOVIMENTAÇÕES");mov.forEach(function(m){var z=(typeof rmCashMovementLabel==='function'?rmCashMovementLabel(m):(m.type||'Movimentação'))+' - '+safeMoney(m.amount);if(m.payment)z+=' ('+m.payment+')';if(m.fromPayment||m.toPayment)z+=' ('+(m.fromPayment||'')+' → '+(m.toPayment||'')+')';if(m.reason)z+=' - '+m.reason;lines.push(z)})}
+    return lines.join('\n');
+  };
+  window.printCashReceipt=function(c){
+    if(!c)return;var x=c.totals||{};
+    var rows=[
+      ["Data",d(c.closedAt||Date.now())],
+      ["Responsável",c.openedBy||"Não identificado"],
+      ["Fechado por",c.closedBy||"Não identificado"],
+      ["Abertura",t(c.openedAt)],["Fechamento",t(c.closedAt)],
+      ["Crianças",String(Number(c.childrenCount||0))],["Produtos",String(Number(c.productsCount||0))],
+      ["Fundo inicial",safeMoney(c.openingAmount)],
+      ["Pix",safeMoney(x.Pix)],["Dinheiro",safeMoney(x.Dinheiro)],["Débito",safeMoney(x['Débito'])],["Crédito",safeMoney(x['Crédito'])],["Cortesia",safeMoney(x.Cortesia)],
+      ["Faturamento",safeMoney(c.revenue)],["Saídas",safeMoney(c.cashOut)],["Estornos",safeMoney(c.refunds)],
+      ["Esperado",safeMoney(c.expectedCash)],["Contado",safeMoney(c.countedCash)],["DIFERENÇA",safeMoney(c.difference)]
+    ];
+    try{printTemplate('FECHAMENTO DE CAIXA',rows)}catch(e){alert(window.rmFormatCashReport(c))}
+  };
+  var oldRenderCash=window.renderCash;
+  if(typeof oldRenderCash==='function'){
+    window.renderCash=function(){
+      oldRenderCash();
+      try{
+        var c=db.cash,el=document.getElementById('cashContent');
+        if(c && !c.open && el && c.history && c.history.length){
+          var last=c.history[c.history.length-1],x=last.totals||{};
+          var box=document.createElement('div');box.className='villa-last-closing';
+          box.style.cssText='margin-top:14px;padding:14px;border-radius:14px;background:#fff;border:1px solid #cbeef2;box-shadow:0 5px 16px rgba(0,90,120,.08)';
+          box.innerHTML='<strong style="color:#064c9d">📋 Último fechamento — '+new Date(last.closedAt).toLocaleDateString('pt-BR')+'</strong><div style="font-size:13px;margin:5px 0 10px;color:#637080">'+t(last.openedAt)+' às '+t(last.closedAt)+' • '+(last.openedBy||'Não identificado')+'</div>'+
+            '<div class="summary-line"><strong>Crianças</strong><span>'+Number(last.childrenCount||0)+'</span></div>'+
+            '<div class="summary-line"><strong>Pix</strong><span>'+safeMoney(x.Pix)+'</span></div>'+
+            '<div class="summary-line"><strong>Dinheiro</strong><span>'+safeMoney(x.Dinheiro)+'</span></div>'+
+            '<div class="summary-line"><strong>Débito</strong><span>'+safeMoney(x['Débito'])+'</span></div>'+
+            '<div class="summary-line"><strong>Crédito</strong><span>'+safeMoney(x['Crédito'])+'</span></div>'+
+            '<div class="summary-line"><strong>Faturamento</strong><span><b>'+safeMoney(last.revenue)+'</b></span></div>'+
+            '<div class="summary-line"><strong>Saídas / Estornos</strong><span>'+safeMoney(Number(last.cashOut||0)+Number(last.refunds||0))+'</span></div>'+
+            '<div class="summary-line"><strong>Diferença</strong><span><b>'+safeMoney(last.difference)+'</b></span></div>';
+          el.appendChild(box);
+        }
+      }catch(e){}
+    }
+  }
+})();
+</script>
+<div id="villa-build-v16" style="position:fixed;right:7px;bottom:7px;z-index:9999;font:700 9px Arial;color:rgba(255,255,255,.7);pointer-events:none">V16</div>
 
 </body>
 </html>
