@@ -1157,7 +1157,7 @@ body{min-height:100vh!important;background:linear-gradient(180deg,#08a9d5 0%,#07
 </head>
 <body>
 <div class="villa-system-decor" aria-hidden="true"><span>☆</span><span>☁</span><span>☆</span><span>○</span><span>♢</span><span>☆</span><span>☁</span><span>☆</span></div>
-<div id="villaVersionBadge">V17</div>
+<div id="villaVersionBadge">V18</div>
 
 
 
@@ -2722,23 +2722,37 @@ function printCashReceipt(c){printTemplate('FECHAMENTO DE CAIXA',[["Abertura",ne
 function printLastCash(){let c=db.cash.history[db.cash.history.length-1];if(c)printCashReceipt(c)}
 
 (function(){
-  window.villaTickTimers=function(){
+  var villaLastSecond=-1;
+  window.villaTickTimers=function(force){
     try{
+      var sec=Math.floor(Date.now()/1000);
+      if(!force && sec===villaLastSecond) return;
+      villaLastSecond=sec;
       (db.sessions||[]).forEach(function(s){
+        var txt="⏱ "+fmt(effectiveMs(s));
+        document.querySelectorAll('[data-villa-timer="'+s.id+'"]').forEach(function(el){
+          if(el.textContent!==txt) el.textContent=txt;
+        });
+        document.querySelectorAll('[data-villa-mobile-timer="'+s.id+'"]').forEach(function(el){
+          if(el.textContent!==txt) el.textContent=txt;
+        });
         if(s.status==="active"){
-          var t=document.querySelector('[data-villa-timer="'+s.id+'"]');
-          if(t) t.textContent="⏱ "+fmt(effectiveMs(s));
-          var pr=document.querySelector('[data-villa-price="'+s.id+'"]');
-          if(pr) pr.textContent="Agora: "+money(villaPriceFor(s).total);
+          var price="Agora: "+money(villaPriceFor(s).total);
+          document.querySelectorAll('[data-villa-price="'+s.id+'"]').forEach(function(el){
+            if(el.textContent!==price) el.textContent=price;
+          });
         }
-        var mt=document.querySelector('[data-villa-mobile-timer="'+s.id+'"]');
-        if(mt) mt.textContent=(typeof elapsed==="function"?elapsed(s):fmt(effectiveMs(s)));
       });
     }catch(e){}
   };
+  function villaTimerLoop(){
+    window.villaTickTimers(false);
+    window.requestAnimationFrame(villaTimerLoop);
+  }
   function vkStartMainRender(){
     try{ render(); }catch(e){ console.error("Villa Kids render inicial:",e); }
-    setInterval(window.villaTickTimers,1000);
+    window.villaTickTimers(true);
+    window.requestAnimationFrame(villaTimerLoop);
   }
   if(localStorage.getItem("villa_kids_session")) vkStartMainRender();
 })();
@@ -3428,6 +3442,7 @@ window.rmShowSessionDetails=function(id){
       const right=document.createElement('div');
       const t=document.createElement('div');
       t.className='rm-mobile-time';
+      t.dataset.villaMobileTimer=s.id;
       t.textContent='⏱ '+elapsed(s);
       const more=document.createElement('button');
       more.className='rm-mobile-more';
@@ -3453,7 +3468,7 @@ window.rmShowSessionDetails=function(id){
         rmRenderMobile();
       });
     });
-    setInterval(function(){if(window.villaTickTimers)window.villaTickTimers();},1000);
+    /* V18: atualizado pelo relógio mestre; sem segundo intervalo. */
     setTimeout(rmRenderMobile,250);
     if(typeof window.render==='function'){
       const oldRender=window.render;
@@ -4145,7 +4160,7 @@ window.rmRenderHomeEventAlerts=function(){
       const timer=document.createElement("div");
       timer.className="rm-mobile-time";
       timer.dataset.villaMobileTimer=s.id;
-      timer.textContent=elapsed(s);
+      timer.textContent="⏱ "+elapsed(s);
 
       const more=document.createElement("button");
       more.type="button";
@@ -5653,7 +5668,7 @@ document.addEventListener("click",function(ev){
   }
   document.addEventListener('DOMContentLoaded',init);setTimeout(init,150);
   // atualização visual do preço em tempo real sem gravar no caixa antes da saída
-  /* V17: cronometro atualiza somente o texto; nao redesenha a lista a cada segundo. */
+  /* V18: cronometro atualiza somente o texto; nao redesenha a lista a cada segundo. */
 })();
 </script>
 <style id="villa-v5-brand-palette">
@@ -5790,7 +5805,21 @@ body{position:relative;isolation:isolate}
   }
 })();
 </script>
-<div id="villa-build-v16" style="position:fixed;right:7px;bottom:7px;z-index:9999;font:700 9px Arial;color:rgba(255,255,255,.7);pointer-events:none">V17</div>
+<div id="villa-build-v16" style="position:fixed;right:7px;bottom:7px;z-index:9999;font:700 9px Arial;color:rgba(255,255,255,.7);pointer-events:none">V18</div>
 
 </body>
 </html>
+<style id="villa-v18-timer-stable">
+.villa-live-timer,.rm-mobile-time{
+  visibility:visible!important;
+  opacity:1!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-width:104px!important;
+  white-space:nowrap!important;
+  font-variant-numeric:tabular-nums!important;
+  font-feature-settings:"tnum" 1!important;
+  contain:layout paint!important;
+}
+</style>
