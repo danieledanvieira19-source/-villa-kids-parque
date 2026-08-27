@@ -1122,7 +1122,26 @@ window.rmSupabase=null;
 window.rmSair=function(){try{localStorage.removeItem("villa_kids_session")}catch(e){} location.replace("index.html?v=12")};
 window.rmTrocarConta=window.rmSair;
 window.rmToggleUserMenu=function(e){if(e)e.stopPropagation();var d=document.getElementById("rmUserMenuDrop");if(d)d.classList.toggle("open")};
-</script></head>
+</script>
+<style id="villa-kids-v14-blue-theme">
+:root{--vk-blue:#08a9d5;--vk-blue2:#0796c5;--vk-navy:#0754a6}
+html,body{background:#08a9d5!important}
+body{background:linear-gradient(rgba(4,168,213,.92),rgba(4,168,213,.92)),url('./villa-kids-logo-transparente.png') center 18%/520px auto no-repeat fixed!important}
+.main{background:transparent!important}
+.sidebar{background:rgba(4,151,199,.94)!important;border-right:1px solid rgba(255,255,255,.24)!important}
+.brand-mini strong,.brand-mini span,.nav button,.footer{color:#fff!important}
+.nav button:hover,.nav button:active{background:rgba(4,78,164,.82)!important;color:#fff!important}
+.card,.stat,.date{background:rgba(255,255,255,.96)!important}
+.villa-live-timer{display:inline-flex!important;align-items:center;gap:5px;margin-top:5px;padding:5px 9px;border-radius:999px;background:#e9fff1;color:#12823d;font-size:13px;font-weight:900;font-variant-numeric:tabular-nums}
+@media(max-width:767px){
+ body{background:linear-gradient(rgba(4,168,213,.91),rgba(4,168,213,.91)),url('./villa-kids-logo-transparente.png') center 100px/330px auto no-repeat fixed!important}
+ .rm-mobile-dashboard{background:transparent!important}
+ .rm-mobile-child,.rm-mobile-search-wrap,.rm-mobile-date,.rm-mobile-tabs button{background:rgba(255,255,255,.96)!important}
+ .rm-mobile-tabs button.active{background:#0754a6!important;color:#fff!important}
+ .rm-mobile-time{background:#e9fff1!important;color:#12823d!important;padding:6px 8px!important;border-radius:10px!important;font-weight:900!important;font-variant-numeric:tabular-nums}
+}
+</style>
+</head>
 <body>
 
 
@@ -1586,7 +1605,7 @@ function renderDate(){let d=new Date();document.getElementById('dateBox').innerH
 function attendanceChargesToday(){return (db.exits||[]).filter(s=>!s.paymentPending&&todayKey(s.exitedAt||s.chargedAt)===todayKey()).reduce((a,s)=>a+Number(s.total||0),0)}
 function revenueToday(){let attendance=attendanceChargesToday();let sales=db.sales.filter(s=>!s.paymentPending&&todayKey(s.at)===todayKey()).reduce((a,s)=>a+Number(s.total||0),0);return attendance+sales}
 function render(){renderDate();let active=db.sessions.filter(s=>s.status==='active'),paused=db.sessions.filter(s=>s.status==='paused');document.getElementById('activeCount').textContent=active.length;document.getElementById('pausedCount').textContent=paused.length;let exitsToday=db.exits.filter(e=>todayKey(e.exitedAt)===todayKey());document.getElementById('exitCount').textContent=exitsToday.length;document.getElementById('revenue').textContent=money(revenueToday());document.getElementById('activeRows').innerHTML=active.length?active.map(rowActive).join(''):'<div class="empty">Nenhuma criança em atendimento agora.</div>';document.getElementById('pausedRows').innerHTML=paused.length?paused.map(rowPaused).join(''):'<div class="empty">Nenhuma criança pausada.</div>';populatePagers();}
-function rowActive(s){const p=villaPriceFor(s);return `<div class="row"><div class="pager">${String(s.pager).padStart(2,'0')}</div><div class="name rm-child-name" onclick="rmOpenChildMenu('\${s.id}','\${esc(s.name)}')"><strong>${esc(s.name)}</strong><small>${s.age!==''?s.age+' anos • ':''}${s.birth?new Date(s.birth+'T12:00:00').toLocaleDateString('pt-BR'):''}</small><span class="rm-who">Cadastro por: ${esc(s.createdBy||"—")}</span></div><div class="pkg"><strong>${villaDiscountName(s.discountRate)}</strong><span class="villa-discount-pill">${Number(s.discountRate||0)*100}% desc.</span><span class="villa-live-price">Agora: ${money(p.total)}</span><small>Início: ${new Date(s.startedAt).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</small></div><div><div class="time">${fmt(effectiveMs(s))}</div><button class="action-mini exitbtn" onclick="pickExit('${s.id}')">↪ Saída</button></div></div>`}
+function rowActive(s){const p=villaPriceFor(s);return `<div class="row"><div class="pager">${String(s.pager).padStart(2,'0')}</div><div class="name rm-child-name" onclick="rmOpenChildMenu('\${s.id}','\${esc(s.name)}')"><strong>${esc(s.name)}</strong><small>${s.age!==''?s.age+' anos • ':''}${s.birth?new Date(s.birth+'T12:00:00').toLocaleDateString('pt-BR'):''}</small><span class="rm-who">Cadastro por: ${esc(s.createdBy||"—")}</span></div><div class="pkg"><strong>${villaDiscountName(s.discountRate)}</strong><span class="villa-discount-pill">${Number(s.discountRate||0)*100}% desc.</span><span class="villa-live-price">Agora: ${money(p.total)}</span><small>Início: ${new Date(s.startedAt).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</small></div><div><div class="time villa-live-timer">⏱ ${fmt(effectiveMs(s))}</div><button class="action-mini exitbtn" onclick="pickExit('${s.id}')">↪ Saída</button></div></div>`}
 function rowPaused(s){const p=villaPriceFor(s);return `<div class="row"><div class="pager" style="background:#ff7a00!important">${String(s.pager).padStart(2,'0')}</div><div class="name rm-child-name" onclick="rmOpenChildMenu('\${s.id}','\${esc(s.name)}')"><strong>${esc(s.name)}</strong><small>${s.age!==''?s.age+' anos':''}</small><span class="rm-who">Pausado por: ${esc(s.pausedBy||"—")}</span></div><div class="pkg"><strong style="color:#ff7a00">PAUSADO • ${fmt(pauseElapsedMs(s))}</strong><span class="villa-live-price">Valor congelado: ${money(p.total)}</span><small>Tempo contabilizado: ${fmt(effectiveMs(s))}</small></div><div><button class="action-mini exitbtn" onclick="pickExit('${s.id}')">↪ Saída</button></div></div>`}
 function populatePagers(){
   let used=new Set(
@@ -3327,7 +3346,10 @@ window.rmShowSessionDetails=function(id){
     return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
   }
   function elapsed(s){
-    try{return (typeof netMs==='function'&&typeof clock==='function')?clock(netMs(s)):''}catch(e){return ''}
+    try{
+      if(typeof effectiveMs==='function' && typeof fmt==='function') return fmt(effectiveMs(s));
+      return '';
+    }catch(e){return ''}
   }
   window.rmRenderMobile=function(){
     const date=document.getElementById('rmMobileDate');
