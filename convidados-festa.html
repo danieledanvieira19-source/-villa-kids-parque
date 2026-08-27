@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Convidados da Festa • Villa Kids Parque</title>
+<style>
+:root{--purple:#5b2fc4;--ink:#29243a}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:var(--ink);background:
+radial-gradient(circle at 8% 7%,rgba(100,190,255,.30),transparent 26%),
+radial-gradient(circle at 92% 9%,rgba(196,139,255,.28),transparent 28%),
+radial-gradient(circle at 72% 92%,rgba(255,148,194,.22),transparent 27%),#f9f7ff;min-height:100vh}
+.wrap{max-width:860px;margin:auto;padding:18px}.top{display:flex;align-items:center;gap:12px;margin-bottom:14px}.back{border:0;border-radius:12px;background:white;padding:10px 14px;font-weight:700}.logo{width:72px;height:72px;object-fit:contain}.title h1{margin:0;color:var(--purple);font-size:24px}.title p{margin:4px 0;color:#6d657c}
+.card{background:rgba(255,255,255,.96);border:1px solid #e6dcf4;border-radius:20px;padding:18px;margin:12px 0;box-shadow:0 10px 35px rgba(75,48,112,.08)}
+.banner{background:linear-gradient(135deg,#eef8ff,#f5eaff,#fff0f7);border-radius:16px;padding:15px;line-height:1.5}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.stat{background:#fff;border:1px solid #e5dcef;border-radius:13px;padding:10px;text-align:center}.stat b{display:block;font-size:21px;color:#5d3f8c}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}label{display:block;font-weight:700;margin:10px 0 6px}input{width:100%;padding:13px;border:1px solid #d9cce9;border-radius:13px;font-size:16px;background:white}
+.primary{width:100%;border:0;border-radius:14px;padding:13px;background:linear-gradient(90deg,#6026da,#bb2fdb);color:white;font-weight:800;font-size:15px;margin-top:10px}
+.guest{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;border:1px solid #e8e0ef;border-radius:14px;padding:11px;margin:8px 0;background:#fff}.guest small{display:block;color:#6e6878;margin-top:3px}.actions{display:flex;gap:6px;flex-wrap:wrap}.actions button{border:0;border-radius:10px;padding:8px 10px;font-weight:700}.in{background:#e9f9ee;color:#26713b}.out{background:#eef3ff;color:#315c9a}.del{background:#fff0f1;color:#a53b48}
+.alert{background:#fff4d8;border:1px solid #f2d58b;color:#765819;padding:10px;border-radius:12px;margin:8px 0;font-weight:700}.adminbox{background:#f5efff;border:1px solid #dfd0f2;padding:11px;border-radius:13px;margin-top:10px}.hidden{display:none!important}
+@media(max-width:600px){.grid2{grid-template-columns:1fr}.guest{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <div class="top"><button class="back" onclick="window.close()">← Voltar</button><img class="logo" src="logo-recreamor-transparente.png"><div class="title"><h1>Convidados da festa</h1><p>Controle de entrada e saída</p></div></div>
+ <div id="blocked" class="card hidden">🔒 Esta área é exclusiva de festas internas.</div>
+ <div id="app" class="hidden">
+  <div class="card">
+   <div id="summary" class="banner"></div>
+   <div class="stats"><div class="stat"><b id="contracted">0</b>Contratadas</div><div class="stat"><b id="inside">0</b>Na festa</div><div class="stat"><b id="entered">0</b>Entraram</div></div>
+   <div id="limitAlert"></div>
+   <div id="adminRegister">
+    <div class="grid2"><div><label>Nome da criança</label><input id="child"></div><div><label>Responsável</label><input id="guardian"></div></div>
+    <label>Telefone do responsável</label><input id="phone" inputmode="tel">
+    <button class="primary" onclick="addGuest()">+ Cadastrar convidado</button>
+   </div>
+   <label>Pesquisar na lista</label><input id="search" oninput="render()" placeholder="Digite o nome...">
+   <div id="list"></div>
+   <div id="adminFinance" class="adminbox"></div>
+  </div>
+ </div>
+</div>
+<script>
+const KEY='villa-kids-manager-data-v1';
+const qp=new URLSearchParams(location.search),eventId=qp.get('id');
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function money(v){return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
+function sess(){try{return JSON.parse(localStorage.getItem('villa_kids_session')||'{}')||{}}catch(e){return {}}}
+function isAdmin(){return String(sess().role||'').toLowerCase()==='admin'}
+let db={events:[]};try{db=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){}
+let e=(db.events||[]).find(x=>String(x.id)===String(eventId));
+function internal(ev){if(ev?.eventType)return ev.eventType==='interno';const p=String(ev?.place||'').toLowerCase();return p.includes('kid')||p.includes('recreamor')||p.includes('food')}
+function save(){localStorage.setItem(KEY,JSON.stringify(db))}
+if(!e||!internal(e)){document.getElementById('blocked').classList.remove('hidden')}
+else{
+ e.partyGuests=Array.isArray(e.partyGuests)?e.partyGuests:[];
+ document.getElementById('app').classList.remove('hidden');
+ if(!isAdmin())document.getElementById('adminRegister').classList.add('hidden');
+ document.getElementById('summary').innerHTML=`<b>${esc(e.child||'Festa interna')}</b><br>${esc(e.date||'')} ${esc(e.time||'')} • ${esc(e.place||'Espaço Kids')}<br><small>${isAdmin()?'ADM: cadastro e controle':'Equipe: marque apenas Chegou / Saiu'}</small>`;
+ render()
+}
+function addGuest(){
+ if(!isAdmin())return;
+ const c=document.getElementById('child').value.trim();if(!c)return alert('Informe o nome da criança.');
+ e.partyGuests.push({id:'pg_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),child:c,guardian:document.getElementById('guardian').value.trim(),phone:document.getElementById('phone').value.trim(),status:'listed',createdAt:Date.now(),createdBy:sess().nome||'ADM'});
+ e.updatedAt=Date.now();save();document.getElementById('child').value='';document.getElementById('guardian').value='';document.getElementById('phone').value='';render()
+}
+function enter(id){const g=e.partyGuests.find(x=>x.id===id);if(!g)return;g.status='inside';g.enteredAt=Date.now();g.enteredBy=sess().nome||'';e.updatedAt=Date.now();save();render()}
+function leave(id){const g=e.partyGuests.find(x=>x.id===id);if(!g)return;g.status='left';g.leftAt=Date.now();g.leftBy=sess().nome||'';e.updatedAt=Date.now();save();render()}
+function del(id){if(!isAdmin()||!confirm('Excluir este convidado?'))return;e.partyGuests=e.partyGuests.filter(x=>x.id!==id);e.updatedAt=Date.now();save();render()}
+function render(){
+ const q=String(document.getElementById('search').value||'').toLowerCase(),all=e.partyGuests||[],filtered=all.filter(g=>!q||String(g.child||'').toLowerCase().includes(q)||String(g.guardian||'').toLowerCase().includes(q));
+ const ins=all.filter(g=>g.status==='inside').length,ent=all.filter(g=>g.enteredAt).length,limit=Number(e.kids||0),ex=Math.max(0,ent-limit);
+ contracted.textContent=limit||'—';inside.textContent=ins;entered.textContent=ent;
+ limitAlert.innerHTML=ex>0?`<div class="alert">⚠️ Limite ultrapassado em ${ex} criança(s). Avise a administração.</div>`:(limit&&ent>=limit?`<div class="alert">⚠️ Limite de ${limit} crianças atingido.</div>`:'');
+ list.innerHTML=filtered.length?filtered.map(g=>`<div class="guest"><div><b>${esc(g.child)}</b><small>${esc(g.guardian||'Responsável não informado')}${g.phone?' • '+esc(g.phone):''}</small><small>${g.status==='inside'?'🟢 Está na festa':g.status==='left'?'🔵 Já saiu':'⚪ Ainda não entrou'}</small></div><div class="actions">${g.status!=='inside'?`<button class="in" onclick="enter('${g.id}')">✓ Chegou</button>`:''}${g.status==='inside'?`<button class="out" onclick="leave('${g.id}')">↗ Saiu</button>`:''}${isAdmin()?`<button class="del" onclick="del('${g.id}')">Excluir</button>`:''}</div></div>`).join(''):'<div style="padding:14px;color:#6d657c">Nenhuma criança cadastrada nesta festa.</div>';
+ if(isAdmin()){const unit=Number(e.extraChildValue||0),val=ex*unit;adminFinance.innerHTML=`<b>🔒 Somente ADM</b><br>Excedentes: ${ex} • Valor por criança: ${unit?money(unit):'não definido'} • Adicional calculado: ${money(val)}`;}else adminFinance.classList.add('hidden')
+}
+</script>
+</body></html>

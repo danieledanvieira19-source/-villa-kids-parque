@@ -1,0 +1,28 @@
+<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Configurar Equipe — Villa Kids</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="cloud-config.js"></script>
+<style>body{font-family:Arial;background:#f5efff;padding:20px;color:#30223f}.card{max-width:520px;margin:auto;background:#fff;padding:24px;border-radius:22px;box-shadow:0 10px 35px #0001}input,button{width:100%;box-sizing:border-box;padding:13px;margin:6px 0;border-radius:12px;border:1px solid #ddd}button{background:#6e2bc6;color:#fff;font-weight:bold;border:0}.ok{color:#087a35}.err{color:#b22}</style>
+<div class="card"><h2>Configurar equipe Villa Kids Parque</h2><p>Use uma vez, após configurar o Supabase. Defina as senhas iniciais.</p>
+<input id="d" type="password" placeholder="Senha da Docinho">
+<input id="s" type="password" placeholder="Senha da Sol">
+<input id="c" type="password" placeholder="Senha da Chocolate">
+<button onclick="criar()">Criar acessos</button><div id="msg"></div></div>
+<script>
+async function criar(){
+ const msg=document.getElementById('msg'),cfg=window.RECREAMOR_CLOUD||{};
+ if(!cfg.supabaseUrl||cfg.supabaseUrl.includes('COLE_AQUI')){msg.innerHTML='<p class=err>Configure cloud-config.js primeiro.</p>';return}
+ const cli=supabase.createClient(cfg.supabaseUrl,cfg.supabaseKey);
+ const users=[
+  ['docinho',document.getElementById('d').value,'Docinho','admin'],
+  ['sol',document.getElementById('s').value,'Sol','funcionario'],
+  ['chocolate',document.getElementById('c').value,'Chocolate','funcionario']
+ ];
+ msg.innerHTML='';
+ for(const [u,p,n,r] of users){
+   if(!p||p.length<6){msg.innerHTML+='<p class=err>'+n+': senha precisa ter pelo menos 6 caracteres.</p>';continue}
+   const {error}=await cli.auth.signUp({email:u+'@recreamor.app',password:p,options:{data:{nome:n,role:r}}});
+   msg.innerHTML+=error?'<p class=err>'+n+': '+error.message+'</p>':'<p class=ok>'+n+': acesso criado.</p>';
+   await cli.auth.signOut();
+ }
+}
+</script></html>

@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Documentos da Festa • Villa Kids Parque</title>
+<style>
+:root{--purple:#5b2fc4;--ink:#29243a;--line:#ded2ee}
+*{box-sizing:border-box} body{margin:0;font-family:Arial,sans-serif;color:var(--ink);background:
+radial-gradient(circle at 8% 7%,rgba(100,190,255,.30),transparent 26%),
+radial-gradient(circle at 92% 9%,rgba(196,139,255,.28),transparent 28%),
+radial-gradient(circle at 72% 92%,rgba(255,148,194,.22),transparent 27%),#f9f7ff;min-height:100vh}
+.wrap{max-width:920px;margin:auto;padding:18px}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:14px}.back{border:0;border-radius:12px;background:white;padding:10px 14px;font-weight:700;box-shadow:0 5px 18px #4c3a6b18}.logo{width:78px;height:78px;object-fit:contain}.title h1{margin:0;color:var(--purple);font-size:25px}.title p{margin:4px 0;color:#6d657c}
+.card{background:rgba(255,255,255,.94);border:1px solid #e6dcf4;border-radius:20px;padding:18px;margin:12px 0;box-shadow:0 10px 35px rgba(75,48,112,.08)}
+.banner{background:linear-gradient(135deg,#eef8ff,#f5eaff,#fff0f7);border-radius:16px;padding:15px;line-height:1.5}
+label{display:block;font-weight:700;margin:12px 0 6px}select{width:100%;padding:13px;border:1px solid #d9cce9;border-radius:13px;font-size:16px;background:white}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.actions button,.printbtn{border:0;border-radius:14px;padding:13px 14px;font-size:15px;font-weight:800;cursor:pointer}
+.actions button{background:#f0e8ff;color:#5430ad}.printbtn{background:linear-gradient(90deg,#6026da,#bb2fdb);color:white}
+.rules{display:grid;gap:9px;font-size:14px;line-height:1.45}
+.doc{display:none;background:#fff url('fundo-aquarelado-recreamor.jpeg') center top/cover no-repeat;border-radius:20px;padding:28px;margin-top:16px;position:relative;overflow:hidden;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-scheme:light}
+.doc.on{display:block}.doc:before{content:"";position:absolute;inset:0;background:rgba(255,255,255,.42);pointer-events:none}
+.inner{position:relative;z-index:1;max-width:780px;margin:auto}.doclogo{display:block;max-width:145px;max-height:100px;object-fit:contain;margin:0 auto 8px}
+.doctitle{text-align:center;color:#654d85;margin:8px 0 22px;font-size:21px}.box{background:rgba(255,255,255,.82);border:1px solid var(--line);border-radius:13px;padding:13px;margin:11px 0}
+.doc p,.doc li{font-size:13.5px;line-height:1.58;text-align:justify}.sign{display:grid;grid-template-columns:1fr 1fr;gap:35px;margin-top:48px;text-align:center}.sign div{border-top:1px solid #555;padding-top:7px;font-size:12px}
+.hidden{display:none!important}.err{padding:18px;background:#fff0f2;color:#a32439;border-radius:14px}
+@media(max-width:620px){.actions{grid-template-columns:1fr}.doc{padding:18px}.sign{grid-template-columns:1fr;gap:40px}}
+@media print{
+ html,body{background:#fff!important;color:#2f2940!important;color-scheme:light!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+ .top,.card,.print-controls{display:none!important}
+ .wrap{max-width:none!important;padding:0!important;background:#fff!important}
+ .doc{display:block!important;border-radius:0!important;padding:15mm!important;margin:0!important;background:#fff url('fundo-aquarelado-recreamor.jpeg') center top/cover no-repeat!important;color:#2f2940!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+ .doc:before{background:rgba(255,255,255,.48)!important}
+ .doc:not(.print-target){display:none!important}
+ .doc,.doc *{color-scheme:light!important}
+ .doc p,.doc li,.doc div,.doc span,.doc b,.doc strong{color:#2f2940!important}
+ .doctitle{color:#654d85!important}
+ .box{background:rgba(255,255,255,.88)!important;border-color:#ded2ee!important}
+ .rm-doc-locked{background:#eef9f1!important;color:#316c40!important}
+}
+</style>
+
+<style id="rm-signature-v427-style">
+.print-controls{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}.print-controls .printbtn{flex:1;min-width:210px}
+.sigmodal{display:none;position:fixed;inset:0;z-index:9999;background:rgba(26,18,43,.55);padding:16px;align-items:center;justify-content:center}
+.sigmodal.open{display:flex}.sigbox{width:min(620px,100%);background:#fff;border-radius:20px;padding:18px;box-shadow:0 24px 70px rgba(0,0,0,.25)}
+.sighead{display:flex;justify-content:space-between;align-items:center;gap:10px}.sighead h2{margin:0;color:#5b2fc4}.sighead button{border:0;border-radius:10px;padding:8px 11px;font-weight:900}
+#signatureCanvas{display:block;width:100%;height:150px;border:2px dashed #bba7d7;border-radius:14px;background:#fff;touch-action:none}
+.sigactions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}.sigactions button{border:0;border-radius:12px;padding:12px;font-weight:800;background:#eee8f7;color:#563c7c}.sigactions .confirm{background:linear-gradient(90deg,#6026da,#bb2fdb);color:#fff}
+.rm-signed-block{margin-top:34px;border-top:1px solid #d8cce7;padding-top:14px;text-align:center}.rm-signed-block img{display:block;max-width:220px;max-height:75px;margin:0 auto 6px}.rm-signed-block b{color:#563c7c}.rm-signed-meta{font-size:11px;color:#6c6576;margin-top:4px}
+.rm-doc-locked{background:#eef9f1;border:1px solid #c8e8d1;color:#316c40;border-radius:12px;padding:10px;margin:12px 0;font-size:12px;font-weight:700}
+@media print{.sigmodal{display:none!important}.rm-signed-block{break-inside:avoid}}
+</style>
+<style id="rm-sign-inline-v428">
+.rm-sign-inline{margin:24px 0 16px;padding:14px;border:2px dashed #bba7d7;border-radius:15px;background:#faf7ff;text-align:center}
+.rm-sign-inline button{width:100%;border:0;border-radius:13px;padding:13px;background:linear-gradient(90deg,#6026da,#bb2fdb);color:#fff;font-size:15px;font-weight:800}
+.rm-sign-inline small{display:block;margin-top:7px;color:#6d6578}
+@media print{.no-print{display:none!important}}
+</style><style id="rm-signature-size-v429">
+.rm-signed-block{font-size:11px!important}
+.rm-signed-block b{font-size:12px!important}
+.rm-signed-meta{font-size:9px!important}
+#signatureCanvas{height:150px!important}
+.sigbox p,.sigbox small{font-size:12px!important}
+</style>
+<style id="rm-signature-responsive-v436">
+.sigmodal{overflow:auto!important;padding:max(10px,env(safe-area-inset-top)) 10px max(10px,env(safe-area-inset-bottom))!important}
+.sigbox{width:min(680px,96vw)!important;max-height:94dvh!important;overflow:auto!important;padding:16px!important}
+#signatureCanvas{width:100%!important;height:clamp(180px,34vh,280px)!important;min-height:180px!important}
+.sigactions{grid-template-columns:1fr 1fr!important}
+@media (orientation:landscape) and (max-height:600px){
+ .sigmodal{align-items:flex-start!important;padding:6px!important}
+ .sigbox{width:min(900px,98vw)!important;max-height:96dvh!important;padding:10px 14px!important}
+ .sighead h2{font-size:20px!important}.sigbox p{margin:5px 0 8px!important;font-size:12px!important}
+ #signatureCanvas{height:190px!important;min-height:190px!important}
+ .sigactions{margin-top:7px!important}.sigactions button{padding:9px!important}
+ .sigbox small{display:block;margin-top:5px!important;font-size:10px!important}
+}
+@media (orientation:portrait) and (max-width:520px){
+ .sigbox{width:96vw!important}
+ #signatureCanvas{height:230px!important;min-height:230px!important}
+ .sigactions{grid-template-columns:1fr!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><button class="back" onclick="window.close(); setTimeout(()=>{ if(!window.closed) history.back(); },150)">← Voltar</button><img class="logo" src="logo-recreamor-transparente.png"><div class="title"><h1>Documentos da festa</h1><p>Villa Kids Parque • Recreação e Eventos</p></div></div>
+  <div id="blocked" class="err hidden">🔒 Área exclusiva do administrador.</div>
+  <div id="app" class="hidden">
+    <div class="card"><div id="summary" class="banner"></div>
+      <label>Tipo de evento para o contrato</label>
+      <select id="eventType" onchange="refreshRules()"><option value="interno">Festa no Espaço Kids</option><option value="externo">Evento externo / Recreação</option></select>
+      <div id="rules" style="margin-top:14px"><strong>🎈 Informações do evento interno</strong><div class="rules" style="margin-top:8px">
+        <div>🍿 <b>Kit lanche:</b> 4 salgados, 2 doces, 1 fatia de bolo e 1 suco de caixinha por criança.</div>
+        <div>🚫 <b>Food Park:</b> não é permitida a entrada com alimentos e bebidas.</div>
+        <div>💧 <b>Exceção:</b> água e água de coco são permitidas para as crianças.</div>
+      </div></div>
+      <div class="actions"><button onclick="showContract()">📑 Contrato</button><button onclick="showImageTerm()">📷 Termo de fotos</button></div>
+    </div>
+    <div class="print-controls hidden" id="printControls">
+<button class="printbtn" id="signBtn" onclick="openSignature()">✍️ Assinar pela Villa Kids Parque</button>
+<button class="printbtn" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+</div>
+    <div id="signatureModal" class="sigmodal">
+ <div class="sigbox">
+  <div class="sighead"><h2>✍️ Assinatura da Villa Kids Parque</h2><button onclick="closeSignature()">✕</button></div>
+  <p>Faça sua assinatura da Villa Kids Parque no quadro abaixo. Ela ficará salva para os próximos documentos.</p>
+  <canvas id="signatureCanvas"></canvas>
+  <div class="sigactions"><button onclick="clearSignature()">Limpar</button><button class="confirm" onclick="confirmSignature()">Salvar assinatura da Villa Kids Parque</button></div>
+  <small>A assinatura ficará salva neste aparelho para ser usada automaticamente nos próximos contratos e termos.</small>
+ </div>
+</div>
+<div id="doc" class="doc"><div class="inner" id="docInner"></div></div>
+  </div>
+</div>
+<script>
+const KEY='villa-kids-manager-data-v1';
+const qp=new URLSearchParams(location.search), eventId=qp.get('id');
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function money(v){return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
+function brDate(v){if(!v)return '____/____/______';const m=String(v).match(/^(\d{4})-(\d{2})-(\d{2})$/);return m?`${m[3]}/${m[2]}/${m[1]}`:String(v)}
+function digits(v){return String(v||'').replace(/\D/g,'')}
+function norm(v){return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase()}
+function resolveContact(ev){
+ const pool=[...(db.customers||[]),...(db.sessions||[]),...(db.exits||[]),...(db.canceled||[])];
+ let c=null;
+ if(ev.guardianCpf)c=pool.find(x=>digits(x.guardianCpf)===digits(ev.guardianCpf));
+ if(!c&&ev.guardian)c=pool.find(x=>norm(x.guardian)===norm(ev.guardian));
+ return {
+  cpf:ev.guardianCpf||c?.guardianCpf||'',
+  phone:ev.phone||c?.phone||c?.guardianPhone||'',
+  email:ev.guardianEmail||c?.email||c?.guardianEmail||''
+ }
+}
+function currentUser(){try{return JSON.parse(localStorage.getItem('villa_kids_session')||'{}')||{}}catch(e){return {}}}
+function admin(){const u=currentUser();return String(u.role||'').toLowerCase()==='admin'||String(u.usuario||'').toLowerCase()==='docinho'||String(u.nome||'').toLowerCase()==='docinho'}
+let db={events:[],customers:[],sessions:[],exits:[],canceled:[]}; try{db=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){}
+let e=(db.events||[]).find(x=>String(x.id)===String(eventId));
+function reloadEventData(){
+  try{
+    const fresh=JSON.parse(localStorage.getItem(KEY)||'{}')||{};
+    db=fresh;
+    const updated=(db.events||[]).find(x=>String(x.id)===String(eventId));
+    if(updated)e=updated;
+  }catch(err){}
+}
+
+if(!admin()){document.getElementById('blocked').classList.remove('hidden')}
+else if(!e){document.getElementById('blocked').textContent='Não encontrei esta festa no aparelho.';document.getElementById('blocked').classList.remove('hidden')}
+else{document.getElementById('app').classList.remove('hidden');init()}
+function financial(){
+ const h=Array.isArray(e.payments)?e.payments:[];
+ const received=h.reduce((a,p)=>a+Number(p.received||p.amount||0),0)+(h.length?0:Number(e.deposit||0));
+ const discount=h.reduce((a,p)=>a+Number(p.discount||0),0);
+ const total=Number(e.total||0);
+ return {total,received,discount,balance:Math.max(0,total-discount-received)}
+}
+function init(){
+ reloadEventData();
+ const f=financial(),place=String(e.place||'').toLowerCase();
+ document.getElementById('eventType').value=e.eventType||((place.includes('kid')||place.includes('recreamor')||place.includes('food'))?'interno':'externo');
+ document.getElementById('summary').innerHTML=`<b>${esc(e.child||'Festa')}</b><br>${esc(e.guardian||'Responsável não informado')} • ${esc(brDate(e.date))} ${esc(e.time||'')}<br>Valor: ${money(f.total)} • Recebido: ${money(f.received)} • Saldo: ${money(f.balance)}`;
+ refreshRules()
+}
+function refreshRules(){document.getElementById('rules').classList.toggle('hidden',document.getElementById('eventType').value!=='interno')}
+
+function refreshFromSystem(){
+  if(!e)return;
+  const oldTotal=Number(e.total||0),oldPayments=JSON.stringify(e.payments||[]);
+  reloadEventData();
+  const f=financial();
+  const summary=document.getElementById('summary');
+  if(summary)summary.innerHTML=`<b>${esc(e.child||'Festa')}</b><br>${esc(e.guardian||'Responsável não informado')} • ${esc(brDate(e.date))} ${esc(e.time||'')}<br>Valor: ${money(f.total)} • Recebido: ${money(f.received)} • Saldo: ${money(f.balance)}`;
+  if(document.getElementById('doc')?.classList.contains('on')){
+    if(currentDocType==='image')showImageTerm(true);else showContract(true);
+  }
+}
+window.addEventListener('storage',function(ev){if(ev.key===KEY)refreshFromSystem()});
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')refreshFromSystem()});
+window.addEventListener('pageshow',function(){refreshFromSystem()});
+
+function header(title){return `<img class="doclogo" src="logo-recreamor-transparente.png"><h1 class="doctitle">${title}</h1>`}
+function details(){
+ const f=financial(),c=resolveContact(e);
+ return `<div class="box"><b>Dados do evento</b><br>Contratante: ${esc(e.guardian||'________________________________')} &nbsp; CPF: ${esc(c.cpf||'________________')}<br>Telefone: ${esc(c.phone||'________________')} &nbsp; E-mail: ${esc(c.email||'________________')}<br>Criança/Evento: ${esc(e.child||'________________')}<br>Data: ${esc(brDate(e.date))} &nbsp; Horário: ${esc(e.time||'____:____')}<br>Local: ${esc(e.place||'________________')}<br>Pacote/Serviço: ${esc(e.package||'________________')}${Number(e.kids||0)>0?` &nbsp; Crianças contratadas: ${esc(e.kids)}`:''}<br>Valor contratado: ${money(f.total)} &nbsp; Recebido: ${money(f.received)} &nbsp; Saldo atual: ${money(f.balance)}</div>`
+}
+function signatures(){
+ const saved=getSavedSignature();
+ const company=saved?`<div class="rm-signed-block"><img src="${saved.image}" alt="Assinatura da Villa Kids Parque"><b>${esc(saved.name||"VILLA KID'S PARQUE")}</b><div>CONTRATADA — VILLA KID'S PARQUE</div><div class="rm-signed-meta">Assinatura eletrônica da contratada • ${esc(saved.atText||'')}</div></div>`:`<div>CONTRATADA — VILLA KID'S PARQUE</div>`;
+ const action=saved?'':`<div class="rm-sign-inline no-print"><button type="button" onclick="openSignature()">✍️ Assinar pela Villa Kids Parque</button><small>Sua assinatura ficará salva para os próximos documentos.</small></div>`;
+ return `${action}<div id="rmSignatureStatus">${saved?'<div class="rm-doc-locked">🔒 Documento assinado pela Villa Kid\'s Parque. O campo do contratante permanece livre para assinatura após o envio do PDF.</div>':''}</div><div class="sign"><div><div style="height:70px"></div><b>${esc(e.guardian||'CONTRATANTE')}</b><div>CONTRATANTE</div></div>${company}</div><p style="text-align:center;margin-top:25px">Aracaju/SE, ____ de __________________ de ______.</p>`
+}
+function renderDoc(body){const d=document.getElementById('doc');d.classList.add('on','print-target');document.getElementById('docInner').innerHTML=body;document.getElementById('printControls').classList.remove('hidden');d.scrollIntoView({behavior:'smooth',block:'start'})}
+
+let currentDocType='contract',sigDrawing=false,sigHasInk=false,sigCtx=null;
+function signatureKey(){return 'rm_recreamor_company_signature_v1'}
+function getSavedSignature(){try{return JSON.parse(localStorage.getItem(signatureKey())||'null')}catch(err){return null}}
+function refreshSignButton(){const b=document.getElementById('signBtn');if(!b)return;const saved=getSavedSignature();b.textContent=saved?'✅ Documento assinado':'✍️ Assinar pela Villa Kid\'s Parque';b.disabled=!!saved}
+function setupCanvas(){
+ const c=document.getElementById('signatureCanvas'),ratio=Math.max(1,window.devicePixelRatio||1),rect=c.getBoundingClientRect();
+ c.width=Math.round(rect.width*ratio);c.height=Math.round(rect.height*ratio);sigCtx=c.getContext('2d');sigCtx.scale(ratio,ratio);sigCtx.lineWidth=1.5;sigCtx.lineCap='round';sigCtx.lineJoin='round';sigCtx.strokeStyle='#25202d';sigHasInk=false;
+ function point(ev){const r=c.getBoundingClientRect(),t=ev.touches?ev.touches[0]:ev;return {x:t.clientX-r.left,y:t.clientY-r.top}}
+ function start(ev){ev.preventDefault();sigDrawing=true;const p=point(ev);sigCtx.beginPath();sigCtx.moveTo(p.x,p.y)}
+ function move(ev){if(!sigDrawing)return;ev.preventDefault();const p=point(ev);sigCtx.lineTo(p.x,p.y);sigCtx.stroke();sigHasInk=true}
+ function end(ev){if(ev)ev.preventDefault();sigDrawing=false}
+ c.onpointerdown=start;c.onpointermove=move;c.onpointerup=end;c.onpointercancel=end;
+ c.ontouchstart=start;c.ontouchmove=move;c.ontouchend=end;
+}
+window.addEventListener('orientationchange',()=>{setTimeout(()=>{const m=document.getElementById('signatureModal');if(m&&m.classList.contains('open'))setupCanvas()},250)});
+function openSignature(){if(getSavedSignature())return alert('A assinatura da Villa Kid\'s Parque já está salva neste aparelho.');document.getElementById('signatureModal').classList.add('open');setTimeout(setupCanvas,50)}
+function closeSignature(){document.getElementById('signatureModal').classList.remove('open')}
+function clearSignature(){if(!sigCtx)return;const c=document.getElementById('signatureCanvas');sigCtx.clearRect(0,0,c.width,c.height);sigHasInk=false}
+function confirmSignature(){
+ if(!sigHasInk)return alert('Peça ao contratante para assinar dentro do quadro.');
+ const c=document.getElementById('signatureCanvas'),now=new Date(),data={image:c.toDataURL('image/png'),name:'VILLA KIDS',at:now.toISOString(),atText:now.toLocaleString('pt-BR')};
+ localStorage.setItem(signatureKey(),JSON.stringify(data));
+ closeSignature();refreshCurrentDocument();refreshSignButton();alert('Assinatura da Villa Kid\'s Parque salva. Ela será usada automaticamente nos próximos documentos.');
+}
+function refreshCurrentDocument(){if(currentDocType==='image')showImageTerm(true);else showContract(true)}
+function showContract(refreshOnly=false){
+ currentDocType='contract';
+ const hasKidsLimit=Number(e.kids||0)>0;
+ if(!refreshOnly&&hasKidsLimit&&!Number(e.extraChildValue||0)){
+   const raw=prompt('Qual o valor por criança excedente para este contrato? (Ex.: 25,00)');
+   if(raw===null)return;
+   const val=Number(String(raw).replace(/[^0-9,.-]/g,'').replace(',','.'));
+   if(!val||val<=0){alert('Informe um valor válido para a criança excedente.');return}
+   e.extraChildValue=val;
+   const real=(db.events||[]).find(x=>String(x.id)===String(e.id));if(real)real.extraChildValue=val;
+   localStorage.setItem(KEY,JSON.stringify(db));
+ }
+ const internal=document.getElementById('eventType').value==='interno';
+ let b=header(internal?'CONTRATO – FESTA NO ESPAÇO KIDS':'CONTRATO – RECREAÇÃO EM EVENTO EXTERNO')+details();
+ let n=1;
+ if(internal){
+   b+=`<p><b>${n++}. Objeto.</b> Prestação dos serviços descritos no cadastro do evento, nas dependências do Espaço Kids Villa Kids Parque, na data e horário informados.</p>`;
+   b+=`<p><b>${n++}. Pagamento.</b> Os valores, descontos e pagamentos efetivamente registrados compõem o histórico financeiro do evento. <b>O saldo remanescente deverá estar integralmente quitado até 1 (uma) hora antes do horário previsto para o início do evento.</b></p>`;
+   if(hasKidsLimit)b+=`<p><b>${n++}. Crianças excedentes.</b> O valor contratado contempla até <b>${esc(e.kids)}</b> crianças. Acima desse limite será cobrado <b>${e.extraChildValue?money(e.extraChildValue):'valor previamente combinado'}</b> por criança excedente, com o adicional incorporado ao valor do evento e ao saldo a receber.</p>`;
+   b+=`<p><b>${n++}. Kit lanche.</b> Quando contratado/incluído, o kit individual contém 4 salgados, 2 doces, 1 fatia de bolo e 1 suco de caixinha.</p>`;
+   b+=`<p><b>${n++}. Regras do Food Park.</b> Não é permitida a entrada com alimentos e bebidas no Food Park, exceto água e água de coco destinadas às crianças.</p>`;
+   b+=`<p><b>${n++}. Uso e segurança.</b> Crianças e convidados deverão respeitar as orientações de segurança e uso dos brinquedos. Danos causados por uso inadequado poderão ser apurados com o responsável.</p>`;
+   b+=`<p><b>${n++}. Alterações, cancelamento e remarcação.</b> Pedidos serão analisados conforme antecedência, disponibilidade de agenda, despesas já assumidas e legislação aplicável, buscando solução proporcional e de boa-fé.</p>`;
+   b+=`<p><b>${n++}. Imagem.</b> A contratação da festa não implica autorização de uso de imagem. Eventual autorização é feita em termo separado e facultativo.</p>`;
+ }else{
+   b+=`<p><b>${n++}. Objeto.</b> Prestação de recreação e/ou serviços contratados no endereço informado, conforme pacote, equipe, duração e atividades combinados.</p>`;
+   b+=`<p><b>${n++}. Estrutura do local.</b> O contratante deverá disponibilizar espaço seguro, adequado e liberado para a execução das atividades, informando previamente restrições do local.</p>`;
+   b+=`<p><b>${n++}. Horário e duração.</b> A equipe atuará pelo período contratado. Permanência além do horário dependerá de disponibilidade e poderá gerar cobrança adicional previamente informada.</p>`;
+   b+=`<p><b>${n++}. Pagamento.</b> Os valores e pagamentos registrados compõem o histórico financeiro. <b>O saldo remanescente deverá estar integralmente quitado até 1 (uma) hora antes do horário previsto para o início do evento.</b></p>`;
+   if(hasKidsLimit)b+=`<p><b>${n++}. Crianças excedentes.</b> Quando houver limite de crianças no pacote, será cobrado <b>${e.extraChildValue?money(e.extraChildValue):'valor previamente combinado'}</b> por criança acima do limite de <b>${esc(e.kids)}</b>, com atualização do valor do evento.</p>`;
+   b+=`<p><b>${n++}. Condições externas.</b> Em eventos ao ar livre, condições climáticas ou de segurança podem exigir adaptação, interrupção ou remarcação das atividades, mediante alinhamento.</p>`;
+   b+=`<p><b>${n++}. Materiais e danos.</b> Os materiais da Villa Kids Parque destinam-se às atividades contratadas. Danos decorrentes de uso indevido poderão ser apurados com o contratante.</p>`;
+   b+=`<p><b>${n++}. Alterações, cancelamento e remarcação.</b> Pedidos serão analisados conforme antecedência, disponibilidade, despesas já assumidas e legislação aplicável, buscando solução proporcional e de boa-fé.</p>`;
+   b+=`<p><b>${n++}. Imagem.</b> A contratação não implica autorização de uso de imagem; eventual autorização é feita em termo separado e facultativo.</p>`;
+ }
+ renderDoc(b+signatures());refreshSignButton()
+}
+function showImageTerm(refreshOnly=false){
+ currentDocType='image';
+ const c=resolveContact(e);
+ const b=header('TERMO DE AUTORIZAÇÃO DE USO DE IMAGEM')+
+ `<div class="box">Responsável: ${esc(e.guardian||'________________________________')}<br>CPF: ${esc(c.cpf||'________________')}<br>Criança: ${esc(e.child||'________________________________')}<br>Evento: ${esc(brDate(e.date))} • ${esc(e.place||'________________')}</div>
+ <p>A escolha abaixo é <b>facultativa</b> e não interfere na contratação ou participação no evento.</p>
+ <div class="box"><p>☐ <b>AUTORIZO</b> gratuitamente a Villa Kids Parque – Recreação e Eventos a registrar e utilizar fotos e vídeos da criança acima identificada, captados durante o evento, para divulgação institucional e promocional, inclusive em redes sociais, site, portfólio e materiais digitais ou impressos, preservando a dignidade e a integridade da criança.</p>
+ <p>☐ <b>NÃO AUTORIZO</b> a utilização de fotos ou vídeos identificáveis da criança para divulgação.</p></div>
+ <p>A autorização, quando concedida, poderá ser revogada para usos futuros mediante solicitação do responsável, observada a legislação aplicável.</p>
+ <p>A Villa Kids Parque compromete-se a não utilizar a imagem em contexto ofensivo, vexatório ou incompatível com a finalidade informada.</p>`+signatures();
+ renderDoc(b+signatures());refreshSignButton()
+}
+</script>
+</body></html>
