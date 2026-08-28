@@ -1090,13 +1090,13 @@ body{background:radial-gradient(circle at 8% 8%,rgba(32,184,205,.22),transparent
 <!-- V9 LOGIN FIXO: logo embutida + cores Villa Kids + Safari -->
 
 
-<meta content="V12-STANDALONE" name="villa-kids-build"/><script id="villa-v12-local-bootstrap">
+<meta content="V21-CLOUD-REPORT-PREVIEW" name="villa-kids-build"/><script id="villa-v12-local-bootstrap">
 window.RECREAMOR_CLOUD={enabled:false,supabaseUrl:"",supabaseKey:"",stateId:"villa-kids-local"};
 window.rmSupabase=null;
 (function(){
   function getSession(){try{return JSON.parse(localStorage.getItem("villa_kids_session")||"null")}catch(e){return null}}
   var s=getSession();
-  if(!s||!s.nome||!s.role){location.replace("index.html?v=15");return;}
+  if(!s||!s.nome||!s.role){location.replace("index.html?v=21");return;}
   window.RECREAMOR_USUARIO_ATUAL=s;
   document.addEventListener("DOMContentLoaded",function(){
     try{
@@ -1119,9 +1119,99 @@ window.rmSupabase=null;
   },{once:true});
 })();
 </script><script id="villa-v12-account-actions">
-window.rmSair=function(){try{localStorage.removeItem("villa_kids_session")}catch(e){} location.replace("index.html?v=15")};
+window.rmSair=function(){try{localStorage.removeItem("villa_kids_session")}catch(e){} location.replace("index.html?v=21")};
 window.rmTrocarConta=window.rmSair;
 window.rmToggleUserMenu=function(e){if(e)e.stopPropagation();var d=document.getElementById("rmUserMenuDrop");if(d)d.classList.toggle("open")};
+</script>
+<script id="villa-v21-cloud-core">
+(function(){
+  const CFG={
+    url:'https://abfeofdqjphgrzvyfgxf.supabase.co',
+    key:'sb_publishable_AtKUUvS1UYvpspVdmQDDoQ_jU9wwkXU',
+    endpoint:'https://abfeofdqjphgrzvyfgxf.supabase.co/functions/v1/villa-api'
+  };
+  window.VILLA_CLOUD=CFG;
+  let applying=false, dirty=false, timer=null, lastRemote=0, pulling=false, initialized=false;
+  function token(){try{return localStorage.getItem('villa_kids_cloud_token')||''}catch(e){return ''}}
+  function hardLogout(){try{localStorage.removeItem('villa_kids_cloud_token');localStorage.removeItem('villa_kids_session')}catch(e){} location.replace('index.html?v=21')}
+  window.villaCloudApi=async function(action,payload){
+    const headers={'Content-Type':'application/json','apikey':CFG.key};
+    const t=token(); if(t)headers['x-villa-token']=t;
+    const r=await fetch(CFG.endpoint,{method:'POST',headers,body:JSON.stringify(Object.assign({action},payload||{}))});
+    const body=await r.json().catch(()=>({error:'Resposta inválida do servidor.'}));
+    if(r.status===401 && action!=='login'){hardLogout();throw new Error(body.error||'Sessão expirada.');}
+    if(!r.ok)throw new Error(body.error||('Erro '+r.status));
+    return body;
+  };
+  function meaningful(x){
+    if(!x||typeof x!=='object')return false;
+    if((x.sessions||[]).length||(x.exits||[]).length||(x.products||[]).length||(x.sales||[]).length||(x.customers||[]).length||(x.events||[]).length)return true;
+    if(x.cash&&((x.cash.history||[]).length||x.cash.open))return true;
+    return !!x.settings;
+  }
+  function refreshUI(){
+    try{if(typeof render==='function')render()}catch(e){}
+    try{if(typeof window.rmRenderMobile==='function')window.rmRenderMobile()}catch(e){}
+    try{if(typeof renderCash==='function')renderCash()}catch(e){}
+    try{if(typeof window.rmRenderHomeEventAlerts==='function')window.rmRenderHomeEventAlerts()}catch(e){}
+    try{if(typeof window.rmRenderUsers==='function')window.rmRenderUsers()}catch(e){}
+  }
+  async function push(data){
+    if(applying)return;
+    dirty=true;
+    try{
+      const r=await window.villaCloudApi('save_state',{data:data});
+      lastRemote=Math.max(lastRemote,Date.parse(r.updated_at||0)||Date.now());
+      dirty=false;
+      return true;
+    }catch(e){console.warn('Villa cloud save:',e);return false;}
+  }
+  window.rmCloudSave=function(data){
+    if(applying)return;
+    dirty=true;
+    clearTimeout(timer);
+    timer=setTimeout(()=>push(JSON.parse(JSON.stringify(data||{}))),450);
+  };
+  window.rmCloudSaveImmediate=async function(data){clearTimeout(timer);return await push(JSON.parse(JSON.stringify(data||{})))};
+  async function pull(initial){
+    if(pulling||dirty)return;
+    pulling=true;
+    try{
+      const r=await window.villaCloudApi('get_state');
+      const ts=Date.parse(r.updated_at||0)||0;
+      const remote=r.data||{};
+      if(r.user){
+        const current={usuario:r.user.usuario,nome:r.user.nome,role:r.user.role,tratamento:r.user.tratamento||'tia'};
+        window.RECREAMOR_USUARIO_ATUAL=current;
+        try{localStorage.setItem('villa_kids_session',JSON.stringify(current))}catch(e){}
+        document.body.classList.toggle('rm-funcionario',current.role==='funcionario');
+      }
+      if(initial && !meaningful(remote)){
+        if(typeof db!=='undefined')await push(db);
+        initialized=true;return;
+      }
+      if(typeof db!=='undefined' && meaningful(remote) && (initial || ts>lastRemote+200)){
+        applying=true;
+        db=(typeof normalize==='function'?normalize(remote):remote);
+        try{localStorage.setItem('villa-kids-manager-data-v1',JSON.stringify(db))}catch(e){}
+        lastRemote=ts;
+        applying=false;
+        refreshUI();
+      }
+      initialized=true;
+    }catch(e){console.warn('Villa cloud pull:',e)}finally{pulling=false;}
+  }
+  document.addEventListener('DOMContentLoaded',function(){
+    setTimeout(()=>pull(true),180);
+    setInterval(()=>{if(initialized)pull(false)},2500);
+  },{once:true});
+  const oldSair=window.rmSair;
+  window.rmSair=async function(){
+    try{await window.villaCloudApi('logout')}catch(e){}
+    hardLogout();
+  };
+  window.rmTrocarConta=window.rmSair;
+})();
 </script>
 <style id="villa-kids-v14-blue-theme">
 :root{--vk-blue:#08a9d5;--vk-blue2:#0796c5;--vk-navy:#0754a6}
@@ -1157,7 +1247,7 @@ body{min-height:100vh!important;background:linear-gradient(180deg,#08a9d5 0%,#07
 </head>
 <body>
 <div class="villa-system-decor" aria-hidden="true"><span>☆</span><span>☁</span><span>☆</span><span>○</span><span>♢</span><span>☆</span><span>☁</span><span>☆</span></div>
-<div id="villaVersionBadge">V20</div>
+<div id="villaVersionBadge">V21</div>
 
 
 
@@ -1492,9 +1582,18 @@ body{min-height:100vh!important;background:linear-gradient(180deg,#08a9d5 0%,#07
 <div class="rm-report-filters"><div><label>Data inicial</label><input id="rmReportFrom" type="date"/></div><div><label>Data final</label><input id="rmReportTo" type="date"/></div></div>
 <div class="rm-report-quick"><button onclick="rmReportRange('today')">Hoje</button><button onclick="rmReportRange('week')">Esta semana</button><button onclick="rmReportRange('month')">Este mês</button><button class="primary" onclick="rmRenderReports()">Gerar relatório</button></div>
 <div id="rmReportOutput"></div>
-<button class="primary rm-print-report" onclick="rmPrintCurrentReportDirect()" style="display:none">🖨️ Imprimir relatório</button>
+<button class="primary rm-print-report" onclick="rmOpenReportPrintPreview()" style="display:none">👁️ Visualizar antes de imprimir</button>
 </div>
 </div>
+</div>
+
+<div class="modal" id="rmReportPreviewModal">
+  <div class="dialog rm-report-preview-dialog">
+    <div class="dialog-head rm-report-preview-head"><h2>👁️ Pré-visualização do relatório</h2><button class="close" onclick="closeModal('rmReportPreviewModal')">✕</button></div>
+    <div class="rm-report-preview-note">A página abaixo é a mesma que será enviada para impressão/PDF. No celular, deslize para os lados para conferir toda a largura.</div>
+    <div class="rm-report-preview-scroll"><section id="rmReportPrintSheet" class="rm-report-print-sheet"></section></div>
+    <div class="rm-report-preview-actions"><button class="secondary" onclick="closeModal('rmReportPreviewModal')" type="button">Voltar</button><button class="primary" onclick="window.print()" type="button">🖨️ Imprimir / Salvar PDF</button></div>
+  </div>
 </div>
 <div class="modal" id="rmPackagesSettingsModal">
 <div class="dialog">
@@ -5818,7 +5917,95 @@ body{position:relative;isolation:isolate}
   }
 })();
 </script>
-<div id="villa-build-v16" style="position:fixed;right:7px;bottom:7px;z-index:9999;font:700 9px Arial;color:rgba(255,255,255,.7);pointer-events:none">V20</div>
+<div id="villa-build-v16" style="position:fixed;right:7px;bottom:7px;z-index:9999;font:700 9px Arial;color:rgba(255,255,255,.7);pointer-events:none">V21</div>
+
+<style id="villa-v21-report-preview-style">
+.rm-report-preview-dialog{width:min(1180px,98vw)!important;max-height:96vh!important}
+.rm-report-preview-note{background:#eaf9fc;color:#075c72;border:1px solid #b9e8ef;border-radius:12px;padding:10px 12px;font-size:13px;margin-bottom:10px}
+.rm-report-preview-scroll{overflow:auto;background:#dfe5ea;border-radius:14px;padding:18px;max-width:100%}
+.rm-report-print-sheet{box-sizing:border-box;width:277mm;min-height:190mm;background:#fff;color:#111;padding:10mm;margin:0 auto;font-family:Arial,sans-serif;font-size:12px;line-height:1.35;box-shadow:0 2px 12px rgba(0,0,0,.12)}
+.rm-report-print-sheet .rm-print-head{text-align:center;border-bottom:2px solid #222;padding-bottom:8px;margin-bottom:12px}
+.rm-report-print-sheet .rm-print-head img{width:48mm;max-height:25mm;object-fit:contain;display:block;margin:0 auto 4px}
+.rm-report-print-sheet .rm-print-head h2{margin:3px 0;font-size:18px;color:#111}
+.rm-report-print-sheet .rm-print-period{font-size:11px;color:#444}
+.rm-report-print-sheet .rm-report-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.rm-report-print-sheet .rm-report-stat{border:1px solid #bbb;border-radius:8px;padding:8px;background:#fff}
+.rm-report-print-sheet .rm-report-table{width:100%;border-collapse:collapse;font-size:10px;margin:8px 0 12px}
+.rm-report-print-sheet .rm-report-table th,.rm-report-print-sheet .rm-report-table td{border:1px solid #bbb;padding:5px;text-align:left;vertical-align:top;color:#111}
+.rm-report-print-sheet .rm-report-table th{background:#f0f0f0;font-weight:700;color:#111}
+.rm-report-print-sheet .rm-event-report-total{border:2px solid #222;padding:8px 10px;display:flex;justify-content:space-between;gap:10px;margin:10px 0;font-weight:700;background:#fff;color:#111}
+.rm-report-preview-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+@page{size:A4 landscape;margin:10mm}
+@media print{
+  html,body{background:#fff!important}
+  body *{visibility:hidden!important}
+  #printArea,#rmReportsModal,#reportModal{display:none!important;visibility:hidden!important}
+  #rmReportPreviewModal,#rmReportPreviewModal *,#rmReportPrintSheet,#rmReportPrintSheet *{visibility:visible!important}
+  #rmReportPreviewModal{display:block!important;position:absolute!important;inset:0!important;background:#fff!important;padding:0!important;overflow:visible!important}
+  #rmReportPreviewModal .rm-report-preview-dialog{display:block!important;width:auto!important;max-height:none!important;overflow:visible!important;padding:0!important;box-shadow:none!important;border-radius:0!important}
+  #rmReportPreviewModal .rm-report-preview-head,#rmReportPreviewModal .rm-report-preview-note,#rmReportPreviewModal .rm-report-preview-actions{display:none!important}
+  #rmReportPreviewModal .rm-report-preview-scroll{display:block!important;overflow:visible!important;background:#fff!important;padding:0!important}
+  #rmReportPrintSheet{display:block!important;position:static!important;width:277mm!important;min-height:190mm!important;padding:0!important;margin:0!important;box-shadow:none!important}
+}
+@media(max-width:600px){.rm-report-preview-actions{grid-template-columns:1fr}.rm-report-preview-scroll{padding:10px}}
+</style>
+<script id="villa-v21-report-preview-js">
+(function(){
+  function brDate(v){if(!v)return '—';const p=String(v).split('-');return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:v}
+  window.rmOpenReportPrintPreview=function(){
+    const src=document.getElementById('rmReportOutput'),sheet=document.getElementById('rmReportPrintSheet');
+    if(!src||!src.innerHTML.trim()){if(typeof toast==='function')toast('Gere o relatório primeiro.');return;}
+    const title=(document.getElementById('rmReportSelectedTitle')||{}).textContent||'Relatório';
+    const from=(document.getElementById('rmReportFrom')||{}).value||'';
+    const to=(document.getElementById('rmReportTo')||{}).value||'';
+    sheet.innerHTML=`<div class="rm-print-head"><img src="villa-kids-logo-transparente.png?v=21" alt="Villa Kids Parque"><h2>${typeof esc==='function'?esc(title):title}</h2><div class="rm-print-period">Período: ${brDate(from)} a ${brDate(to)} • Gerado em ${new Date().toLocaleString('pt-BR')}</div></div><div class="rm-print-body">${src.innerHTML}</div>`;
+    document.getElementById('rmReportPreviewModal').classList.add('open');
+  };
+  window.rmPrintCurrentReportDirect=window.rmOpenReportPrintPreview;
+})();
+</script>
+<script id="villa-v21-cloud-users">
+(function(){
+  function clean(v){return String(v||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9._-]/g,'')}
+  function ensureUsers(){if(!db.settings)db.settings={};if(!Array.isArray(db.settings.users))db.settings.users=[]}
+  function admin(){const u=window.RECREAMOR_USUARIO_ATUAL||{};return u.role==='admin'||u.usuario==='admin'}
+  window.rmCreateUser=async function(){
+    if(!admin()){toast('Área exclusiva do administrador.');return}
+    ensureUsers();
+    const nome=(document.getElementById('rmNewUserName').value||'').trim();
+    const usuario=clean(document.getElementById('rmNewUsername').value);
+    const password=document.getElementById('rmNewUserPassword').value||'';
+    const role=document.getElementById('rmNewUserRole').value||'funcionario';
+    const tratamento=document.getElementById('rmNewUserTreatment').value||'tia';
+    const msg=document.getElementById('rmCreateUserMsg');
+    const show=(t,ok)=>{if(msg){msg.textContent=t;msg.style.color=ok?'#087a35':'#b22'}};
+    if(!nome||!usuario){show('Preencha nome e usuário.',false);return}
+    if(password.length<6){show('A senha precisa ter pelo menos 6 caracteres.',false);return}
+    const btn=document.querySelector('#rmUsersSettingsModal button[onclick="rmCreateUser()"]'),old=btn?btn.textContent:'';
+    if(btn){btn.disabled=true;btn.textContent='Criando...'}
+    try{
+      const r=await window.villaCloudApi('create_user',{nome,usuario,password,role,tratamento});
+      db.settings.users=db.settings.users.filter(x=>String(x.usuario||'').toLowerCase()!==usuario);
+      db.settings.users.push({usuario:r.user.usuario,nome:r.user.nome,role:r.user.role,tratamento:r.user.tratamento,active:true,createdAt:Date.now()});
+      save(); if(window.rmCloudSaveImmediate)await window.rmCloudSaveImmediate(db);
+      ['rmNewUserName','rmNewUsername','rmNewUserPassword'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=''});
+      document.getElementById('rmNewUserRole').value='funcionario';document.getElementById('rmNewUserTreatment').value='tia';
+      rmRenderUsers();show('Usuário criado e pronto para entrar em qualquer aparelho.',true);toast('Usuário criado com sucesso.');
+    }catch(e){show(e.message||'Não foi possível criar o usuário.',false);toast('Não foi possível criar o usuário.');}
+    finally{if(btn){btn.disabled=false;btn.textContent=old}}
+  };
+  window.rmToggleUserRole=async function(usuario){
+    if(!admin())return;ensureUsers();const u=db.settings.users.find(x=>clean(x.usuario)===clean(usuario));if(!u||clean(usuario)==='admin')return;
+    const newRole=u.role==='admin'?'funcionario':'admin';
+    try{await window.villaCloudApi('update_user',{usuario:clean(usuario),role:newRole});u.role=newRole;u.updatedAt=Date.now();save();if(window.rmCloudSaveImmediate)await window.rmCloudSaveImmediate(db);rmRenderUsers();toast('Perfil atualizado.')}catch(e){toast(e.message||'Não foi possível atualizar.');}
+  };
+  window.rmToggleUserActive=async function(usuario){
+    if(!admin())return;ensureUsers();const u=db.settings.users.find(x=>clean(x.usuario)===clean(usuario));if(!u||clean(usuario)==='admin')return;
+    const active=u.active===false?true:false;
+    try{await window.villaCloudApi('update_user',{usuario:clean(usuario),active});u.active=active;u.updatedAt=Date.now();save();if(window.rmCloudSaveImmediate)await window.rmCloudSaveImmediate(db);rmRenderUsers();toast(active?'Usuário ativado.':'Usuário desativado.')}catch(e){toast(e.message||'Não foi possível atualizar.');}
+  };
+})();
+</script>
 
 </body>
 </html>

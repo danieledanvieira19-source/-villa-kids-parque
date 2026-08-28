@@ -116,6 +116,8 @@ label{display:block;font-weight:700;margin:12px 0 6px}select{width:100%;padding:
 </div>
 <script>
 const KEY='villa-kids-manager-data-v1';
+const VILLA_API='https://abfeofdqjphgrzvyfgxf.supabase.co/functions/v1/villa-api',VILLA_KEY='sb_publishable_AtKUUvS1UYvpspVdmQDDoQ_jU9wwkXU';
+async function villaCloudSave(){try{const t=localStorage.getItem('villa_kids_cloud_token')||'';if(!t)return;await fetch(VILLA_API,{method:'POST',headers:{'Content-Type':'application/json','apikey':VILLA_KEY,'x-villa-token':t},body:JSON.stringify({action:'save_state',data:db})})}catch(err){console.warn(err)}}
 const qp=new URLSearchParams(location.search), eventId=qp.get('id');
 function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function money(v){return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
@@ -228,7 +230,7 @@ function showContract(refreshOnly=false){
    if(!val||val<=0){alert('Informe um valor válido para a criança excedente.');return}
    e.extraChildValue=val;
    const real=(db.events||[]).find(x=>String(x.id)===String(e.id));if(real)real.extraChildValue=val;
-   localStorage.setItem(KEY,JSON.stringify(db));
+   localStorage.setItem(KEY,JSON.stringify(db));villaCloudSave();
  }
  const internal=document.getElementById('eventType').value==='interno';
  let b=header(internal?'CONTRATO – FESTA NO ESPAÇO KIDS':'CONTRATO – RECREAÇÃO EM EVENTO EXTERNO')+details();

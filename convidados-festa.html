@@ -43,6 +43,11 @@ radial-gradient(circle at 72% 92%,rgba(255,148,194,.22),transparent 27%),#f9f7ff
 </div>
 <script>
 const KEY='villa-kids-manager-data-v1';
+const VILLA_API='https://abfeofdqjphgrzvyfgxf.supabase.co/functions/v1/villa-api',VILLA_KEY='sb_publishable_AtKUUvS1UYvpspVdmQDDoQ_jU9wwkXU';
+async function villaApi(action,payload){const t=localStorage.getItem('villa_kids_cloud_token')||'';const r=await fetch(VILLA_API,{method:'POST',headers:{'Content-Type':'application/json','apikey':VILLA_KEY,'x-villa-token':t},body:JSON.stringify(Object.assign({action},payload||{}))});const b=await r.json().catch(()=>({}));if(!r.ok)throw new Error(b.error||'Falha na nuvem');return b}
+let cloudStamp=0,cloudDirty=false;
+async function cloudPush(){cloudDirty=true;try{const r=await villaApi('save_state',{data:db});cloudStamp=Date.parse(r.updated_at||0)||Date.now();cloudDirty=false}catch(err){console.warn(err)}}
+async function cloudPull(){if(cloudDirty)return;try{const r=await villaApi('get_state'),ts=Date.parse(r.updated_at||0)||0;if(ts>cloudStamp+200&&r.data&&Object.keys(r.data).length){db=r.data;localStorage.setItem(KEY,JSON.stringify(db));e=(db.events||[]).find(x=>String(x.id)===String(eventId));cloudStamp=ts;if(e&&internal(e)){e.partyGuests=Array.isArray(e.partyGuests)?e.partyGuests:[];render()}}}catch(err){console.warn(err)}}
 const qp=new URLSearchParams(location.search),eventId=qp.get('id');
 function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function money(v){return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
@@ -51,7 +56,7 @@ function isAdmin(){return String(sess().role||'').toLowerCase()==='admin'}
 let db={events:[]};try{db=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){}
 let e=(db.events||[]).find(x=>String(x.id)===String(eventId));
 function internal(ev){if(ev?.eventType)return ev.eventType==='interno';const p=String(ev?.place||'').toLowerCase();return p.includes('kid')||p.includes('recreamor')||p.includes('food')}
-function save(){localStorage.setItem(KEY,JSON.stringify(db))}
+function save(){localStorage.setItem(KEY,JSON.stringify(db));cloudPush()}
 if(!e||!internal(e)){document.getElementById('blocked').classList.remove('hidden')}
 else{
  e.partyGuests=Array.isArray(e.partyGuests)?e.partyGuests:[];
@@ -77,5 +82,6 @@ function render(){
  list.innerHTML=filtered.length?filtered.map(g=>`<div class="guest"><div><b>${esc(g.child)}</b><small>${esc(g.guardian||'Responsável não informado')}${g.phone?' • '+esc(g.phone):''}</small><small>${g.status==='inside'?'🟢 Está na festa':g.status==='left'?'🔵 Já saiu':'⚪ Ainda não entrou'}</small></div><div class="actions">${g.status!=='inside'?`<button class="in" onclick="enter('${g.id}')">✓ Chegou</button>`:''}${g.status==='inside'?`<button class="out" onclick="leave('${g.id}')">↗ Saiu</button>`:''}${isAdmin()?`<button class="del" onclick="del('${g.id}')">Excluir</button>`:''}</div></div>`).join(''):'<div style="padding:14px;color:#6d657c">Nenhuma criança cadastrada nesta festa.</div>';
  if(isAdmin()){const unit=Number(e.extraChildValue||0),val=ex*unit;adminFinance.innerHTML=`<b>🔒 Somente ADM</b><br>Excedentes: ${ex} • Valor por criança: ${unit?money(unit):'não definido'} • Adicional calculado: ${money(val)}`;}else adminFinance.classList.add('hidden')
 }
+setInterval(cloudPull,2500);
 </script>
 </body></html>
