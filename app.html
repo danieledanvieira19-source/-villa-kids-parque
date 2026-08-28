@@ -1157,7 +1157,7 @@ body{min-height:100vh!important;background:linear-gradient(180deg,#08a9d5 0%,#07
 </head>
 <body>
 <div class="villa-system-decor" aria-hidden="true"><span>☆</span><span>☁</span><span>☆</span><span>○</span><span>♢</span><span>☆</span><span>☁</span><span>☆</span></div>
-<div id="villaVersionBadge">V19</div>
+<div id="villaVersionBadge">V20</div>
 
 
 
@@ -1620,7 +1620,7 @@ function renderDate(){let d=new Date();document.getElementById('dateBox').innerH
 function attendanceChargesToday(){return (db.exits||[]).filter(s=>!s.paymentPending&&todayKey(s.exitedAt||s.chargedAt)===todayKey()).reduce((a,s)=>a+Number(s.total||0),0)}
 function revenueToday(){let attendance=attendanceChargesToday();let sales=db.sales.filter(s=>!s.paymentPending&&todayKey(s.at)===todayKey()).reduce((a,s)=>a+Number(s.total||0),0);return attendance+sales}
 function render(){renderDate();let active=db.sessions.filter(s=>s.status==='active'),paused=db.sessions.filter(s=>s.status==='paused');document.getElementById('activeCount').textContent=active.length;document.getElementById('pausedCount').textContent=paused.length;let exitsToday=db.exits.filter(e=>todayKey(e.exitedAt)===todayKey());document.getElementById('exitCount').textContent=exitsToday.length;document.getElementById('revenue').textContent=money(revenueToday());document.getElementById('activeRows').innerHTML=active.length?active.map(rowActive).join(''):'<div class="empty">Nenhuma criança em atendimento agora.</div>';document.getElementById('pausedRows').innerHTML=paused.length?paused.map(rowPaused).join(''):'<div class="empty">Nenhuma criança pausada.</div>';populatePagers();}
-function rowActive(s){const p=villaPriceFor(s);return `<div class="row" data-villa-session="${s.id}"><div class="pager">${String(s.pager).padStart(2,'0')}</div><div class="name rm-child-name" onclick="rmOpenChildMenu('\${s.id}','\${esc(s.name)}')"><strong>${esc(s.name)}</strong><small>${s.age!==''?s.age+' anos • ':''}${s.birth?new Date(s.birth+'T12:00:00').toLocaleDateString('pt-BR'):''}</small><span class="rm-who">Cadastro por: ${esc(s.createdBy||"—")}</span></div><div class="pkg"><strong>${villaDiscountName(s.discountRate)}</strong><span class="villa-discount-pill">${Number(s.discountRate||0)*100}% desc.</span><span class="villa-live-price" data-villa-price="${s.id}">Agora: ${money(p.total)}</span><small>Início: ${new Date(s.startedAt).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</small></div><div><div class="time villa-live-timer" data-villa-timer="${s.id}">⏱ ${fmt(effectiveMs(s))}</div><button class="action-mini exitbtn" onclick="pickExit('${s.id}')">↪ Saída</button></div></div>`}
+function rowActive(s){const p=villaPriceFor(s);return `<div class="row" data-villa-session="${s.id}"><div class="pager">${String(s.pager).padStart(2,'0')}</div><div class="name rm-child-name" onclick="rmOpenChildMenu('\${s.id}','\${esc(s.name)}')"><strong>${esc(s.name)}</strong><small>${s.age!==''?s.age+' anos • ':''}${s.birth?new Date(s.birth+'T12:00:00').toLocaleDateString('pt-BR'):''}</small><span class="rm-who">Cadastro por: ${esc(s.createdBy||"—")}</span></div><div class="pkg"><strong>${villaDiscountName(s.discountRate)}</strong><span class="villa-discount-pill">${Number(s.discountRate||0)*100}% desc.</span><span class="villa-live-price" data-villa-price="${s.id}">Agora: ${money(p.total)}</span><small>Início: ${new Date(s.startedAt).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</small></div><div><div class="time villa-live-timer"><span class="villa-timer-icon">⏱</span><span class="villa-timer-digits" data-villa-timer="${s.id}">${fmt(effectiveMs(s))}</span></div><button class="action-mini exitbtn" onclick="pickExit('${s.id}')">↪ Saída</button></div></div>`}
 function rowPaused(s){const p=villaPriceFor(s);return `<div class="row"><div class="pager" style="background:#ff7a00!important">${String(s.pager).padStart(2,'0')}</div><div class="name rm-child-name" onclick="rmOpenChildMenu('\${s.id}','\${esc(s.name)}')"><strong>${esc(s.name)}</strong><small>${s.age!==''?s.age+' anos':''}</small><span class="rm-who">Pausado por: ${esc(s.pausedBy||"—")}</span></div><div class="pkg"><strong style="color:#ff7a00">PAUSADO • ${fmt(pauseElapsedMs(s))}</strong><span class="villa-live-price">Valor congelado: ${money(p.total)}</span><small>Tempo contabilizado: ${fmt(effectiveMs(s))}</small></div><div><button class="action-mini exitbtn" onclick="pickExit('${s.id}')">↪ Saída</button></div></div>`}
 function populatePagers(){
   let used=new Set(
@@ -2732,7 +2732,7 @@ function printLastCash(){let c=db.cash.history[db.cash.history.length-1];if(c)pr
       villaLastSecond=sec;
 
       (db.sessions||[]).forEach(function(s){
-        var txt="⏱ "+fmt(effectiveMs(s));
+        var txt=fmt(effectiveMs(s));
 
         document.querySelectorAll('[data-villa-timer="'+s.id+'"]').forEach(function(el){
           if(el.textContent!==txt) el.textContent=txt;
@@ -3456,7 +3456,7 @@ window.rmShowSessionDetails=function(id){
       const t=document.createElement('div');
       t.className='rm-mobile-time';
       t.dataset.villaMobileTimer=s.id;
-      t.textContent='⏱ '+elapsed(s);
+      t.innerHTML='<span class="villa-timer-icon">⏱</span><span class="villa-timer-digits" data-villa-mobile-timer="'+s.id+'">'+elapsed(s)+'</span>';
       const more=document.createElement('button');
       more.className='rm-mobile-more';
       more.textContent='⋮';
@@ -3481,7 +3481,7 @@ window.rmShowSessionDetails=function(id){
         rmRenderMobile();
       });
     });
-    /* V19: atualizado pelo relógio mestre; sem segundo intervalo. */
+    /* V20: atualizado pelo relógio mestre; sem segundo intervalo. */
     setTimeout(rmRenderMobile,250);
     if(typeof window.render==='function'){
       const oldRender=window.render;
@@ -4173,7 +4173,7 @@ window.rmRenderHomeEventAlerts=function(){
       const timer=document.createElement("div");
       timer.className="rm-mobile-time";
       timer.dataset.villaMobileTimer=s.id;
-      timer.textContent="⏱ "+elapsed(s);
+      timer.innerHTML='<span class="villa-timer-icon">⏱</span><span class="villa-timer-digits" data-villa-mobile-timer="'+s.id+'">'+elapsed(s)+'</span>';
 
       const more=document.createElement("button");
       more.type="button";
@@ -5681,7 +5681,7 @@ document.addEventListener("click",function(ev){
   }
   document.addEventListener('DOMContentLoaded',init);setTimeout(init,150);
   // atualização visual do preço em tempo real sem gravar no caixa antes da saída
-  /* V19: cronometro atualiza somente o texto; nao redesenha a lista a cada segundo. */
+  /* V20: cronometro atualiza somente o texto; nao redesenha a lista a cada segundo. */
 })();
 </script>
 <style id="villa-v5-brand-palette">
@@ -5818,7 +5818,7 @@ body{position:relative;isolation:isolate}
   }
 })();
 </script>
-<div id="villa-build-v16" style="position:fixed;right:7px;bottom:7px;z-index:9999;font:700 9px Arial;color:rgba(255,255,255,.7);pointer-events:none">V19</div>
+<div id="villa-build-v16" style="position:fixed;right:7px;bottom:7px;z-index:9999;font:700 9px Arial;color:rgba(255,255,255,.7);pointer-events:none">V20</div>
 
 </body>
 </html>
@@ -5858,5 +5858,52 @@ body{position:relative;isolation:isolate}
   contain:layout style paint!important;
   backface-visibility:hidden!important;
   -webkit-backface-visibility:hidden!important;
+}
+</style>
+
+<style id="villa-v20-timer-no-jump">
+.villa-live-timer,
+.rm-mobile-time{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:5px!important;
+  width:122px!important;
+  min-width:122px!important;
+  max-width:122px!important;
+  height:24px!important;
+  line-height:24px!important;
+  padding:0!important;
+  margin:0!important;
+  overflow:hidden!important;
+  white-space:nowrap!important;
+  transition:none!important;
+  animation:none!important;
+  transform:none!important;
+}
+.villa-timer-icon{
+  display:inline-block!important;
+  flex:0 0 20px!important;
+  width:20px!important;
+  min-width:20px!important;
+  max-width:20px!important;
+  text-align:center!important;
+  line-height:24px!important;
+}
+.villa-timer-digits{
+  display:inline-block!important;
+  flex:0 0 92px!important;
+  width:92px!important;
+  min-width:92px!important;
+  max-width:92px!important;
+  text-align:left!important;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace!important;
+  font-variant-numeric:tabular-nums!important;
+  font-feature-settings:"tnum" 1!important;
+  letter-spacing:0!important;
+  line-height:24px!important;
+  transform:none!important;
+  transition:none!important;
+  animation:none!important;
 }
 </style>
