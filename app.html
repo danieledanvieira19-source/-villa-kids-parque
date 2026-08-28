@@ -1090,13 +1090,14 @@ body{background:radial-gradient(circle at 8% 8%,rgba(32,184,205,.22),transparent
 <!-- V9 LOGIN FIXO: logo embutida + cores Villa Kids + Safari -->
 
 
-<meta content="V27-FESTAS-LOGO-WELCOME" name="villa-kids-build"/><script id="villa-v12-local-bootstrap">
+<meta content="V28-DESKTOP-MARIA" name="villa-kids-build"/><script id="villa-v12-local-bootstrap">
 window.RECREAMOR_CLOUD={enabled:false,supabaseUrl:"",supabaseKey:"",stateId:"villa-kids-local"};
 window.rmSupabase=null;
 (function(){
   function getSession(){try{return JSON.parse(localStorage.getItem("villa_kids_session")||"null")}catch(e){return null}}
   var s=getSession();
-  if(!s||!s.nome||!s.role){location.replace("index.html?v=27");return;}
+  if(!s||!s.nome||!s.role){location.replace("index.html?v=28");return;}
+  if(String(s.usuario||"").toLowerCase()==="admin"){s.nome="Maria";try{localStorage.setItem("villa_kids_session",JSON.stringify(s))}catch(e){}}
   window.RECREAMOR_USUARIO_ATUAL=s;
   document.addEventListener("DOMContentLoaded",function(){
     try{
@@ -1119,7 +1120,7 @@ window.rmSupabase=null;
   },{once:true});
 })();
 </script><script id="villa-v12-account-actions">
-window.rmSair=function(){try{localStorage.removeItem("villa_kids_session")}catch(e){} location.replace("index.html?v=27")};
+window.rmSair=function(){try{localStorage.removeItem("villa_kids_session")}catch(e){} location.replace("index.html?v=28")};
 window.rmTrocarConta=window.rmSair;
 window.rmToggleUserMenu=function(e){if(e)e.stopPropagation();var d=document.getElementById("rmUserMenuDrop");if(d)d.classList.toggle("open")};
 </script>
@@ -1133,7 +1134,7 @@ window.rmToggleUserMenu=function(e){if(e)e.stopPropagation();var d=document.getE
   window.VILLA_CLOUD=CFG;
   let applying=false, dirty=false, timer=null, lastRemote=0, pulling=false, initialized=false;
   function token(){try{return localStorage.getItem('villa_kids_cloud_token')||''}catch(e){return ''}}
-  function hardLogout(){try{localStorage.removeItem('villa_kids_cloud_token');localStorage.removeItem('villa_kids_session')}catch(e){} location.replace('index.html?v=27')}
+  function hardLogout(){try{localStorage.removeItem('villa_kids_cloud_token');localStorage.removeItem('villa_kids_session')}catch(e){} location.replace('index.html?v=28')}
   window.villaCloudApi=async function(action,payload){
     const headers={'Content-Type':'application/json','apikey':CFG.key};
     const t=token(); if(t)headers['x-villa-token']=t;
@@ -1181,7 +1182,7 @@ window.rmToggleUserMenu=function(e){if(e)e.stopPropagation();var d=document.getE
       const ts=Date.parse(r.updated_at||0)||0;
       const remote=r.data||{};
       if(r.user){
-        const current={usuario:r.user.usuario,nome:r.user.nome,role:r.user.role,tratamento:r.user.tratamento||'tia'};
+        const current={usuario:r.user.usuario,nome:(String(r.user.usuario||'').toLowerCase()==='admin'?'Maria':r.user.nome),role:r.user.role,tratamento:r.user.tratamento||'tia'};
         window.RECREAMOR_USUARIO_ATUAL=current;
         try{localStorage.setItem('villa_kids_session',JSON.stringify(current))}catch(e){}
         document.body.classList.toggle('rm-funcionario',current.role==='funcionario');
@@ -1247,7 +1248,7 @@ body{min-height:100vh!important;background:linear-gradient(180deg,#08a9d5 0%,#07
 </head>
 <body>
 <div class="villa-system-decor" aria-hidden="true"><span>☆</span><span>☁</span><span>☆</span><span>○</span><span>♢</span><span>☆</span><span>☁</span><span>☆</span></div>
-<div id="villaVersionBadge">V27</div>
+<div id="villaVersionBadge">V28</div>
 
 
 
@@ -1281,11 +1282,11 @@ body{min-height:100vh!important;background:linear-gradient(180deg,#08a9d5 0%,#07
 <button data-filter="paused">Pausadas</button>
 </div>
 <div class="rm-mobile-list" id="rmMobileList"></div>
-</section><div class="top"><div class="logo-wrap"><img alt="Logo Villa Kids" src="villa-kids-logo-redonda.png?v=27"/></div><div class="date" id="dateBox"></div></div>
+</section><div class="top"><div class="logo-wrap"><img alt="Logo Villa Kids" src="villa-kids-logo-redonda.png?v=28"/></div><div class="date" id="dateBox"></div></div>
 <div class="rm-home-event-alerts rm-home-event-alerts-desktop" id="rmHomeEventAlertsDesktop"></div>
 <section class="stats"><div class="stat blue"><div class="icon">👥</div><div><small>Crianças Ativas</small><strong id="activeCount">0</strong><small>Agora no espaço</small></div></div><div class="stat orange"><div class="icon">⏸</div><div><small>Pausadas</small><strong id="pausedCount">0</strong><small>No momento</small></div></div><div class="stat green"><div class="icon">↪</div><div><small>Saídas de Hoje</small><strong id="exitCount">0</strong><small>Total do dia</small></div></div><div class="stat purple"><div class="icon">$</div><div><small>Faturamento Hoje</small><strong id="revenue">R$ 0,00</strong><small>Atendimentos + vendas</small></div></div><div class="stat blue"><div class="icon">👥</div><div><small>Usuários</small><strong id="usersCount">3</strong><small>Ativos</small></div></div></section>
 <section class="content"><div class="card" id="activeCard"><h3 style="color:#1675e8">👥 Crianças Ativas Agora</h3><div class="rows" id="activeRows"></div></div><div class="card" id="pausedCard"><h3 style="color:#ff7a00">⏸ Crianças Pausadas</h3><div class="rows" id="pausedRows"></div></div></section>
-<section class="lower"><div class="card quick"><h3 style="color:#1675e8">⚡ Ações Rápidas</h3><div class="quick-grid"><button class="q qb" onclick="openEntry()"><b>👤＋</b>Nova Entrada<small>Registrar criança</small></button><button class="q qp" onclick="openCustomers()"><b>👨‍👩‍👧</b>Clientes<small>Cadastros e histórico</small></button><button class="q qo" onclick="openPausePicker()"><b>⏸</b>Pausar Criança<small>Parar cronômetro</small></button><button class="q qg" onclick="openReturnPicker()"><b>▶</b>Retornar Criança<small>Voltar cronômetro</small></button><button class="q qr" onclick="openExitPicker()"><b>↪</b>Registrar Saída<small>Finalizar atendimento</small></button><button class="q qp" onclick="openSale()"><b>🛒</b>Nova Venda<small>Produtos do balcão</small></button><button class="q qp" onclick="openProducts()"><b>📦</b>Produtos<small>Preço e estoque</small></button><button class="q qg" onclick="openCash()"><b>💵</b>Caixa<small>Abrir / acompanhar / fechar</small></button><button class="q qb" onclick="openReport()"><b>▥</b>Relatórios<small>Resumo do dia</small></button></div></div><div class="card info"><h3 style="color:#6e2bc6">💡 Informações Importantes</h3><div class="notice"><div class="nicon">🎂</div><div><strong>Data de nascimento</strong><small>A idade é calculada automaticamente no cadastro.</small></div></div><div class="notice"><div class="nicon">🖨️</div><div><strong>Cupom 58 mm</strong><small>Entrada, saída, venda e fechamento podem ser impressos.</small></div></div><div class="notice"><div class="nicon">📱</div><div><strong>Uso em celular</strong></div></div></div></section>
+<section class="lower"><div class="card quick"><h3 style="color:#1675e8">⚡ Ações Rápidas</h3><div class="quick-grid vk-quick-three"><button class="q qb" onclick="openEntry()"><b>👤＋</b>Nova Entrada<small>Registrar criança</small></button><button class="q qp" onclick="openSale()"><b>🛒</b>Nova Venda<small>Produtos do balcão</small></button><button class="q qg" onclick="openCash()"><b>💵</b>Caixa<small>Abrir / acompanhar / fechar</small></button></div></div><div class="card info"><h3 style="color:#6e2bc6">💡 Informações Importantes</h3><div class="notice"><div class="nicon">🎂</div><div><strong>Data de nascimento</strong><small>A idade é calculada automaticamente no cadastro.</small></div></div><div class="notice"><div class="nicon">🖨️</div><div><strong>Cupom 58 mm</strong><small>Entrada, saída, venda e fechamento podem ser impressos.</small></div></div><div class="notice"><div class="nicon">📱</div><div><strong>Uso em celular</strong></div></div></div></section>
 <div class="footer">Villa Kids Parque • Espaço Kids 💙</div></main></div>
 <div class="mobilebar"><button onclick="openEntry()"><b>＋</b>Entrada</button><button onclick="openPausePicker()"><b>⏸</b>Pausa</button><button onclick="openExitPicker()"><b>↪</b>Saída</button><button onclick="openSale()"><b>🛒</b>Venda</button><button onclick="openCash()"><b>💵</b>Caixa</button></div>
 <div class="modal" id="entryModal"><div class="dialog"><div class="dialog-head"><h2>Nova Entrada</h2><button class="close" onclick="closeModal('entryModal')">✕</button></div><form id="entryForm">
@@ -4338,7 +4339,7 @@ window.rmRenderHomeEventAlerts=function(){
 
     // Register existing known accounts for management, without duplicating.
     const defaults=[
-      {usuario:"admin",nome:"Proprietária",role:"admin",active:true,system:true,tratamento:"tia"}
+      {usuario:"admin",nome:"Maria",role:"admin",active:true,system:true,tratamento:"tia"}
     ];
     defaults.forEach(d=>{
       const existing=db.settings.users.find(x=>String(x.usuario||"").toLowerCase()===d.usuario);
@@ -4373,7 +4374,7 @@ window.rmRenderHomeEventAlerts=function(){
     box.innerHTML=users.map(u=>`
       <div class="rm-user-row ${u.active===false?"rm-user-disabled":""}">
         <div>
-          <strong>${u.tratamento==="tio"?"Tio":"Tia"} ${esc(String(u.nome||u.usuario).replace(/^ti[oa]\s+/i,""))}</strong>
+          <strong>${u.usuario==="admin"?"Maria":((u.tratamento==="tio"?"Tio":"Tia")+" "+esc(String(u.nome||u.usuario).replace(/^ti[oa]\s+/i,"")))}</strong>
           <small>@${esc(u.usuario)} • ${u.role==="admin"?"Administrador":"Funcionária"} • ${u.active===false?"Desativado":"Ativo"}</small>
         </div>
         <div class="rm-user-actions">
@@ -5918,7 +5919,7 @@ body{position:relative;isolation:isolate}
   }
 })();
 </script>
-<div id="villa-build-v26" style="position:fixed;right:7px;bottom:7px;z-index:9999;font:700 9px Arial;color:rgba(255,255,255,.7);pointer-events:none">V27</div>
+<div id="villa-build-v26" style="position:fixed;right:7px;bottom:7px;z-index:9999;font:700 9px Arial;color:rgba(255,255,255,.7);pointer-events:none">V28</div>
 
 <style id="villa-v22-report-preview-style">
 .rm-report-preview-dialog{width:min(560px,98vw)!important;max-height:96vh!important}
@@ -5962,7 +5963,7 @@ body{position:relative;isolation:isolate}
     const title=(document.getElementById('rmReportSelectedTitle')||{}).textContent||'Relatório';
     const from=(document.getElementById('rmReportFrom')||{}).value||'';
     const to=(document.getElementById('rmReportTo')||{}).value||'';
-    sheet.innerHTML=`<div class="rm-print-head"><img src="villa-kids-logo-transparente.png?v=27" alt="Villa Kids Parque"><h2>${typeof esc==='function'?esc(title):title}</h2><div class="rm-print-period">Período: ${brDate(from)} a ${brDate(to)} • Gerado em ${new Date().toLocaleString('pt-BR')}</div></div><div class="rm-print-body">${src.innerHTML}</div>`;
+    sheet.innerHTML=`<div class="rm-print-head"><img src="villa-kids-logo-transparente.png?v=28" alt="Villa Kids Parque"><h2>${typeof esc==='function'?esc(title):title}</h2><div class="rm-print-period">Período: ${brDate(from)} a ${brDate(to)} • Gerado em ${new Date().toLocaleString('pt-BR')}</div></div><div class="rm-print-body">${src.innerHTML}</div>`;
     document.getElementById('rmReportPreviewModal').classList.add('open');
   };
   window.rmPrintCurrentReportDirect=window.rmOpenReportPrintPreview;
@@ -6042,7 +6043,7 @@ body{position:relative;isolation:isolate}
 </style>
 <div id="vkWelcomeOverlay" hidden role="dialog" aria-modal="true" aria-labelledby="vkWelcomeTitle">
  <div class="vk-welcome-card">
-  <img class="vk-welcome-logo" src="villa-kids-logo-transparente.png?v=27" alt="Villa Kids Parque">
+  <img class="vk-welcome-logo" src="villa-kids-logo-transparente.png?v=28" alt="Villa Kids Parque">
   <h2 id="vkWelcomeTitle">Seja bem-vinda!</h2>
   <p id="vkWelcomeText">Que seja um ótimo dia de trabalho! 💙</p>
   <button id="vkWelcomeBtn" type="button">COMEÇAR</button>
@@ -6058,13 +6059,22 @@ body{position:relative;isolation:isolate}
   var tr=String(sess.tratamento||'tia').toLowerCase()==='tio'?'Tio':'Tia';
   var nome=String(sess.nome||sess.usuario||'').replace(/^ti[oa]\s+/i,'').trim();
   var title=document.getElementById('vkWelcomeTitle');
-  if(title)title.textContent='Seja bem-vind'+(tr==='Tia'?'a':'o')+', '+tr+(nome?' '+nome:'')+'!';
+  if(title)title.textContent='Seja bem-vind'+(tr==='Tia'?'a':'o')+(nome?', '+nome:'')+'!';
   ov.hidden=false;
   var btn=document.getElementById('vkWelcomeBtn'); if(btn)btn.onclick=function(){ov.hidden=true;try{localStorage.removeItem('villa_kids_show_welcome')}catch(e){}};
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',showWelcome,{once:true});else setTimeout(showWelcome,0);
 })();
 </script>
+
+<style id="villa-v28-desktop-cleanup">
+/* V28: tela de computador mais limpa */
+.rm-settings-fab,.rm-events-fab,.rm-reports-fab{display:none!important}
+@media(min-width:768px){
+  .quick-grid.vk-quick-three{grid-template-columns:repeat(3,minmax(0,1fr))!important;max-width:980px;margin:0 auto;gap:20px}
+  .quick-grid.vk-quick-three .q{min-height:210px}
+}
+</style>
 </body>
 </html>
 <style id="villa-v18-timer-stable">
