@@ -1247,7 +1247,7 @@ body{min-height:100vh!important;background:linear-gradient(180deg,#08a9d5 0%,#07
 </head>
 <body>
 <div class="villa-system-decor" aria-hidden="true"><span>☆</span><span>☁</span><span>☆</span><span>○</span><span>♢</span><span>☆</span><span>☁</span><span>☆</span></div>
-<div id="villaVersionBadge">V22</div>
+<div id="villaVersionBadge">V24</div>
 
 
 
@@ -5917,7 +5917,7 @@ body{position:relative;isolation:isolate}
   }
 })();
 </script>
-<div id="villa-build-v22" style="position:fixed;right:7px;bottom:7px;z-index:9999;font:700 9px Arial;color:rgba(255,255,255,.7);pointer-events:none">V22</div>
+<div id="villa-build-v24" style="position:fixed;right:7px;bottom:7px;z-index:9999;font:700 9px Arial;color:rgba(255,255,255,.7);pointer-events:none">V24</div>
 
 <style id="villa-v22-report-preview-style">
 .rm-report-preview-dialog{width:min(560px,98vw)!important;max-height:96vh!important}
@@ -5961,7 +5961,7 @@ body{position:relative;isolation:isolate}
     const title=(document.getElementById('rmReportSelectedTitle')||{}).textContent||'Relatório';
     const from=(document.getElementById('rmReportFrom')||{}).value||'';
     const to=(document.getElementById('rmReportTo')||{}).value||'';
-    sheet.innerHTML=`<div class="rm-print-head"><img src="villa-kids-logo-transparente.png?v=22" alt="Villa Kids Parque"><h2>${typeof esc==='function'?esc(title):title}</h2><div class="rm-print-period">Período: ${brDate(from)} a ${brDate(to)} • Gerado em ${new Date().toLocaleString('pt-BR')}</div></div><div class="rm-print-body">${src.innerHTML}</div>`;
+    sheet.innerHTML=`<div class="rm-print-head"><img src="villa-kids-logo-transparente.png?v=24" alt="Villa Kids Parque"><h2>${typeof esc==='function'?esc(title):title}</h2><div class="rm-print-period">Período: ${brDate(from)} a ${brDate(to)} • Gerado em ${new Date().toLocaleString('pt-BR')}</div></div><div class="rm-print-body">${src.innerHTML}</div>`;
     document.getElementById('rmReportPreviewModal').classList.add('open');
   };
   window.rmPrintCurrentReportDirect=window.rmOpenReportPrintPreview;
