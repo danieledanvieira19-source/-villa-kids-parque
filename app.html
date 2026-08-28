@@ -1157,7 +1157,7 @@ body{min-height:100vh!important;background:linear-gradient(180deg,#08a9d5 0%,#07
 </head>
 <body>
 <div class="villa-system-decor" aria-hidden="true"><span>☆</span><span>☁</span><span>☆</span><span>○</span><span>♢</span><span>☆</span><span>☁</span><span>☆</span></div>
-<div id="villaVersionBadge">V18</div>
+<div id="villaVersionBadge">V19</div>
 
 
 
@@ -2723,19 +2723,25 @@ function printLastCash(){let c=db.cash.history[db.cash.history.length-1];if(c)pr
 
 (function(){
   var villaLastSecond=-1;
+  var villaTimerHandle=null;
+
   window.villaTickTimers=function(force){
     try{
       var sec=Math.floor(Date.now()/1000);
       if(!force && sec===villaLastSecond) return;
       villaLastSecond=sec;
+
       (db.sessions||[]).forEach(function(s){
         var txt="⏱ "+fmt(effectiveMs(s));
+
         document.querySelectorAll('[data-villa-timer="'+s.id+'"]').forEach(function(el){
           if(el.textContent!==txt) el.textContent=txt;
         });
+
         document.querySelectorAll('[data-villa-mobile-timer="'+s.id+'"]').forEach(function(el){
           if(el.textContent!==txt) el.textContent=txt;
         });
+
         if(s.status==="active"){
           var price="Agora: "+money(villaPriceFor(s).total);
           document.querySelectorAll('[data-villa-price="'+s.id+'"]').forEach(function(el){
@@ -2745,15 +2751,22 @@ function printLastCash(){let c=db.cash.history[db.cash.history.length-1];if(c)pr
       });
     }catch(e){}
   };
-  function villaTimerLoop(){
-    window.villaTickTimers(false);
-    window.requestAnimationFrame(villaTimerLoop);
+
+  function villaScheduleNextTick(){
+    if(villaTimerHandle) clearTimeout(villaTimerHandle);
+    var delay = 1000 - (Date.now() % 1000) + 20;
+    villaTimerHandle = setTimeout(function(){
+      window.villaTickTimers(false);
+      villaScheduleNextTick();
+    }, delay);
   }
+
   function vkStartMainRender(){
     try{ render(); }catch(e){ console.error("Villa Kids render inicial:",e); }
     window.villaTickTimers(true);
-    window.requestAnimationFrame(villaTimerLoop);
+    villaScheduleNextTick();
   }
+
   if(localStorage.getItem("villa_kids_session")) vkStartMainRender();
 })();
 </script>
@@ -3468,7 +3481,7 @@ window.rmShowSessionDetails=function(id){
         rmRenderMobile();
       });
     });
-    /* V18: atualizado pelo relógio mestre; sem segundo intervalo. */
+    /* V19: atualizado pelo relógio mestre; sem segundo intervalo. */
     setTimeout(rmRenderMobile,250);
     if(typeof window.render==='function'){
       const oldRender=window.render;
@@ -5668,7 +5681,7 @@ document.addEventListener("click",function(ev){
   }
   document.addEventListener('DOMContentLoaded',init);setTimeout(init,150);
   // atualização visual do preço em tempo real sem gravar no caixa antes da saída
-  /* V18: cronometro atualiza somente o texto; nao redesenha a lista a cada segundo. */
+  /* V19: cronometro atualiza somente o texto; nao redesenha a lista a cada segundo. */
 })();
 </script>
 <style id="villa-v5-brand-palette">
@@ -5805,7 +5818,7 @@ body{position:relative;isolation:isolate}
   }
 })();
 </script>
-<div id="villa-build-v16" style="position:fixed;right:7px;bottom:7px;z-index:9999;font:700 9px Arial;color:rgba(255,255,255,.7);pointer-events:none">V18</div>
+<div id="villa-build-v16" style="position:fixed;right:7px;bottom:7px;z-index:9999;font:700 9px Arial;color:rgba(255,255,255,.7);pointer-events:none">V19</div>
 
 </body>
 </html>
@@ -5821,5 +5834,29 @@ body{position:relative;isolation:isolate}
   font-variant-numeric:tabular-nums!important;
   font-feature-settings:"tnum" 1!important;
   contain:layout paint!important;
+}
+</style>
+
+<style id="villa-v19-timer-anti-flicker">
+.villa-live-timer,
+.rm-mobile-time{
+  min-width:112px!important;
+  width:112px!important;
+  max-width:112px!important;
+  height:24px!important;
+  line-height:24px!important;
+  padding:0!important;
+  margin:0!important;
+  border:0!important;
+  transform:none!important;
+  transition:none!important;
+  animation:none!important;
+  text-rendering:geometricPrecision!important;
+  -webkit-font-smoothing:antialiased!important;
+  font-variant-numeric:tabular-nums!important;
+  font-feature-settings:"tnum" 1!important;
+  contain:layout style paint!important;
+  backface-visibility:hidden!important;
+  -webkit-backface-visibility:hidden!important;
 }
 </style>
