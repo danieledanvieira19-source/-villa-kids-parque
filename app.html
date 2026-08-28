@@ -1069,7 +1069,7 @@ body.rm-funcionario .rm-party-register-admin{display:none!important}
 <style id="villa-v2-brand">
 :root{--villa-blue:#20b8cd;--villa-deep:#108fa8;--villa-soft:#e8fbfd;--villa-yellow:#ffc51b;--villa-pink:#ee4f8f;--villa-purple:#68429b;--villa-green:#79b52b}
 body{background:radial-gradient(circle at 8% 8%,rgba(32,184,205,.22),transparent 28%),radial-gradient(circle at 90% 18%,rgba(255,197,27,.12),transparent 22%),radial-gradient(circle at 88% 88%,rgba(238,79,143,.10),transparent 25%),linear-gradient(145deg,#f8feff,#e8fbfd 52%,#f7fdff)!important}
-.sidebar{border-right:1px solid rgba(32,184,205,.18)!important}.menuicon,.primary{background:linear-gradient(90deg,var(--villa-blue),var(--villa-deep))!important}.brand-mini strong,.dialog-head h2,.date{color:var(--villa-deep)!important}.nav button{color:#187f92!important}.nav button:hover{background:linear-gradient(90deg,var(--villa-blue),var(--villa-deep))!important;color:#fff!important}.footer{color:var(--villa-deep)!important}.logo-wrap img{background:#fff;box-shadow:0 8px 25px rgba(16,143,168,.12);padding:6px}.rainbow img{background:#fff}.pager{background:var(--villa-blue)!important}.rm-pager-grid button.selected{background:var(--villa-blue)!important;border-color:var(--villa-deep)!important}.time{color:var(--villa-deep)!important}
+.sidebar{border-right:1px solid rgba(32,184,205,.18)!important}.menuicon,.primary{background:linear-gradient(90deg,var(--villa-blue),var(--villa-deep))!important}.brand-mini strong,.dialog-head h2,.date{color:var(--villa-deep)!important}.nav button{color:#187f92!important}.nav button:hover{background:linear-gradient(90deg,var(--villa-blue),var(--villa-deep))!important;color:#fff!important}.footer{color:var(--villa-deep)!important}.logo-wrap img{background:transparent!important;box-shadow:none!important;padding:0!important;border-radius:0!important}.rainbow img{background:transparent!important;border-radius:0!important}.pager{background:var(--villa-blue)!important}.rm-pager-grid button.selected{background:var(--villa-blue)!important;border-color:var(--villa-deep)!important}.time{color:var(--villa-deep)!important}
 .villa-live-price{font-weight:900;color:var(--villa-deep);display:block;margin-top:3px}.villa-discount-pill{display:inline-block;padding:4px 8px;border-radius:999px;background:var(--villa-soft);color:var(--villa-deep);font-size:11px;font-weight:900;margin-top:3px}
 </style>
 <style id="villa-discount-cleanup">.rm-extra-pcd-wrap{display:none!important}</style>
@@ -1090,13 +1090,13 @@ body{background:radial-gradient(circle at 8% 8%,rgba(32,184,205,.22),transparent
 <!-- V9 LOGIN FIXO: logo embutida + cores Villa Kids + Safari -->
 
 
-<meta content="V24-WELCOME-FIX" name="villa-kids-build"/><script id="villa-v12-local-bootstrap">
+<meta content="V25-FESTAS-LOGO-WELCOME" name="villa-kids-build"/><script id="villa-v12-local-bootstrap">
 window.RECREAMOR_CLOUD={enabled:false,supabaseUrl:"",supabaseKey:"",stateId:"villa-kids-local"};
 window.rmSupabase=null;
 (function(){
   function getSession(){try{return JSON.parse(localStorage.getItem("villa_kids_session")||"null")}catch(e){return null}}
   var s=getSession();
-  if(!s||!s.nome||!s.role){location.replace("index.html?v=24");return;}
+  if(!s||!s.nome||!s.role){location.replace("index.html?v=25");return;}
   window.RECREAMOR_USUARIO_ATUAL=s;
   document.addEventListener("DOMContentLoaded",function(){
     try{
@@ -1119,7 +1119,7 @@ window.rmSupabase=null;
   },{once:true});
 })();
 </script><script id="villa-v12-account-actions">
-window.rmSair=function(){try{localStorage.removeItem("villa_kids_session")}catch(e){} location.replace("index.html?v=24")};
+window.rmSair=function(){try{localStorage.removeItem("villa_kids_session")}catch(e){} location.replace("index.html?v=25")};
 window.rmTrocarConta=window.rmSair;
 window.rmToggleUserMenu=function(e){if(e)e.stopPropagation();var d=document.getElementById("rmUserMenuDrop");if(d)d.classList.toggle("open")};
 </script>
@@ -1133,7 +1133,7 @@ window.rmToggleUserMenu=function(e){if(e)e.stopPropagation();var d=document.getE
   window.VILLA_CLOUD=CFG;
   let applying=false, dirty=false, timer=null, lastRemote=0, pulling=false, initialized=false;
   function token(){try{return localStorage.getItem('villa_kids_cloud_token')||''}catch(e){return ''}}
-  function hardLogout(){try{localStorage.removeItem('villa_kids_cloud_token');localStorage.removeItem('villa_kids_session')}catch(e){} location.replace('index.html?v=24')}
+  function hardLogout(){try{localStorage.removeItem('villa_kids_cloud_token');localStorage.removeItem('villa_kids_session')}catch(e){} location.replace('index.html?v=25')}
   window.villaCloudApi=async function(action,payload){
     const headers={'Content-Type':'application/json','apikey':CFG.key};
     const t=token(); if(t)headers['x-villa-token']=t;
@@ -1247,7 +1247,7 @@ body{min-height:100vh!important;background:linear-gradient(180deg,#08a9d5 0%,#07
 </head>
 <body>
 <div class="villa-system-decor" aria-hidden="true"><span>☆</span><span>☁</span><span>☆</span><span>○</span><span>♢</span><span>☆</span><span>☁</span><span>☆</span></div>
-<div id="villaVersionBadge">V24</div>
+<div id="villaVersionBadge">V25</div>
 
 
 
@@ -1480,9 +1480,10 @@ body{min-height:100vh!important;background:linear-gradient(180deg,#08a9d5 0%,#07
 <div class="field"><label>Quantidade de crianças (opcional)</label><input id="rmEventKids" min="0" placeholder="Deixe em branco quando não se aplicar" type="number"/></div><div class="field"><label>Valor por criança excedente (R$) — opcional</label><input id="rmEventExtraChildValue" min="0" placeholder="Preencha somente se houver limite de crianças" step="0.01" type="number"/></div>
 </div>
 <div class="grid2">
-<div class="field"><label>Valor total</label><input id="rmEventTotal" min="0" step="0.01" type="number"/></div>
-<div class="field"><label>Sinal recebido</label><input id="rmEventDeposit" min="0" step="0.01" type="number"/></div>
+<div class="field"><label>Valor total</label><input id="rmEventTotal" min="0" step="0.01" type="number" oninput="vkUpdateEventBalance()"/></div>
+<div class="field"><label>Sinal recebido</label><input id="rmEventDeposit" min="0" step="0.01" type="number" oninput="vkUpdateEventBalance()"/></div>
 </div>
+<div class="banner" id="vkEventBalanceBox" style="font-weight:900">💰 Falta receber: R$ 0,00</div>
 <div class="field"><label>Status</label><select id="rmEventStatus"><option>Orçamento</option><option>Reservada</option><option>Confirmada</option><option>Realizada</option><option>Cancelada</option></select></div>
 <div class="field"><label>Equipe escalada</label><input id="rmEventTeam" placeholder="Ex.: Tia Sol, Tio Cacau"/></div>
 <div class="field"><label>Observações</label><textarea id="rmEventNotes" rows="3"></textarea></div>
@@ -3871,7 +3872,7 @@ window.rmRenderHomeEventAlerts=function(){
    const q=(document.getElementById("rmEventSearch")?.value||"").toLowerCase();
    const a=all.filter(e=>[e.child,e.guardian,e.place].join(" ").toLowerCase().includes(q));
    const box=document.getElementById("rmEventsList");if(!box)return;
-   box.innerHTML=a.length?a.map(e=>{const total=Number(e.total||0),hist=Array.isArray(e.payments)?e.payments:[],histReceived=hist.reduce((a,p)=>a+Number(p.received||p.amount||0),0),legacy=hist.length?0:Number(e.deposit||0),received=histReceived+legacy,discount=hist.reduce((a,p)=>a+Number(p.discount||0),0),effective=Math.max(0,total-discount),realized=String(e.status||"").toLowerCase()==="realizada",bal=realized?0:Math.max(0,effective-received),paid=realized||bal<=0;return `<div class="rm-event-card"><div class="rm-event-top"><div><strong>${esc(e.child||"Evento")}</strong><div class="rm-event-meta">📅 ${e.date||"—"} • ${e.time||"—"} • ${esc(e.place||"Local não informado")}</div></div><span class="rm-status">${esc(e.status||"Orçamento")}</span></div><div class="rm-event-meta">Responsável: ${esc(e.guardian||"—")} • ${esc(e.phone||"")}</div><div class="rm-event-meta">${esc(e.package||"Sem pacote")} • ${e.kids||0} crianças • Equipe: ${esc(e.team||"Não definida")}</div><div class="rm-event-money">Valor original: ${money(total)} • Descontos: ${money(discount)} • Valor recebido: ${money(received)}</div><div class="rm-event-balance ${paid?'paid':''}">${paid?'✅ Festa totalmente paga':'💰 Falta receber: '+money(bal)}</div><div class="rm-event-meta">${hist.length?'<details><summary>Histórico de pagamentos ('+hist.length+')</summary>'+hist.slice().reverse().map(p=>'<div style="padding:7px 0;border-bottom:1px solid #eee"><div>'+new Date(p.at).toLocaleDateString('pt-BR')+' • '+esc(p.method||'Não informado')+' • Recebido: '+money(Number(p.received||0))+(Number(p.discount||0)>0?' • Desconto: '+money(Number(p.discount||0)):'')+(Number(p.change||0)>0?' • Troco: '+money(Number(p.change||0)):'')+'</div><div style="display:flex;gap:6px;margin-top:6px"><button type="button" style="padding:5px 9px;font-size:12px" onclick="rmEditEventPaymentHistory(\''+e.id+'\',\''+p.id+'\')">✏️ Editar</button><button type="button" style="padding:5px 9px;font-size:12px;color:#b42318" onclick="rmDeleteEventPaymentHistory(\''+e.id+'\',\''+p.id+'\')">🗑️ Excluir</button></div></div>').join('')+'</details>':'Sem pagamentos registrados'}</div><div class="rm-event-actions"><button onclick="rmOpenEventPayment('${e.id}')">💰 Pagamento</button>${((e.eventType||((String(e.place||"").toLowerCase().includes("kid")||String(e.place||"").toLowerCase().includes("recreamor")||String(e.place||"").toLowerCase().includes("food"))?"interno":"externo"))==="interno")?`<button type="button" onclick="window.open('convidados-festa.html?id='+encodeURIComponent('${e.id}'),'_blank')">👧 Convidados</button>`:""}<button onclick="window.open('documentos-festa.html?id='+encodeURIComponent('${e.id}'),'_blank')">📄 Documentos</button><button onclick="rmEditEvent('${e.id}')">✏️ Editar</button><button onclick="rmDeleteEvent('${e.id}')">🗑️ Excluir</button></div></div>`}).join(""):'<div class="empty">Nenhuma festa cadastrada.</div>'
+   box.innerHTML=a.length?a.map(e=>{const total=Number(e.total||0),hist=Array.isArray(e.payments)?e.payments:[],histReceived=hist.reduce((a,p)=>a+Number(p.received||p.amount||0),0),legacy=hist.length?0:Number(e.deposit||0),received=histReceived+legacy,discount=hist.reduce((a,p)=>a+Number(p.discount||0),0),effective=Math.max(0,total-discount),realized=String(e.status||"").toLowerCase()==="realizada",bal=realized?0:Math.max(0,effective-received),paid=realized||bal<=0;return `<div class="rm-event-card"><div class="rm-event-top"><div><strong>${esc(e.child||"Evento")}</strong><div class="rm-event-meta">📅 ${e.date||"—"} • ${e.time||"—"} • ${esc(e.place||"Local não informado")}</div></div><span class="rm-status">${esc(e.status||"Orçamento")}</span></div><div class="rm-event-meta">Responsável: ${esc(e.guardian||"—")} • ${esc(e.phone||"")}</div><div class="rm-event-meta">${esc(e.package||"Sem pacote")} • ${e.kids||0} crianças • Equipe: ${esc(e.team||"Não definida")}</div><div class="rm-event-money">Valor original: ${money(total)} • Descontos: ${money(discount)} • Valor recebido: ${money(received)}</div><div class="rm-event-balance ${paid?'paid':''}">${'💰 Falta receber: '+money(bal)+(paid?' • ✅ Festa totalmente paga':'')}</div><div class="rm-event-meta">${hist.length?'<details><summary>Histórico de pagamentos ('+hist.length+')</summary>'+hist.slice().reverse().map(p=>'<div style="padding:7px 0;border-bottom:1px solid #eee"><div>'+new Date(p.at).toLocaleDateString('pt-BR')+' • '+esc(p.method||'Não informado')+' • Recebido: '+money(Number(p.received||0))+(Number(p.discount||0)>0?' • Desconto: '+money(Number(p.discount||0)):'')+(Number(p.change||0)>0?' • Troco: '+money(Number(p.change||0)):'')+'</div><div style="display:flex;gap:6px;margin-top:6px"><button type="button" style="padding:5px 9px;font-size:12px" onclick="rmEditEventPaymentHistory(\''+e.id+'\',\''+p.id+'\')">✏️ Editar</button><button type="button" style="padding:5px 9px;font-size:12px;color:#b42318" onclick="rmDeleteEventPaymentHistory(\''+e.id+'\',\''+p.id+'\')">🗑️ Excluir</button></div></div>').join('')+'</details>':'Sem pagamentos registrados'}</div><div class="rm-event-actions"><button onclick="rmOpenEventPayment('${e.id}')">💰 Pagamento</button>${((e.eventType||((String(e.place||"").toLowerCase().includes("kid")||String(e.place||"").toLowerCase().includes("recreamor")||String(e.place||"").toLowerCase().includes("food"))?"interno":"externo"))==="interno")?`<button type="button" onclick="window.open('convidados-festa.html?id='+encodeURIComponent('${e.id}'),'_blank')">👧 Convidados</button>`:""}<button onclick="window.open('documentos-festa.html?id='+encodeURIComponent('${e.id}'),'_blank')">📄 Documentos</button><button onclick="rmEditEvent('${e.id}')">✏️ Editar</button><button onclick="rmDeleteEvent('${e.id}')">🗑️ Excluir</button></div></div>`}).join(""):'<div class="empty">Nenhuma festa cadastrada.</div>'
  }
 
  window.rmDeleteEventPaymentHistory=function(eventId,paymentId){
@@ -5917,7 +5918,7 @@ body{position:relative;isolation:isolate}
   }
 })();
 </script>
-<div id="villa-build-v24" style="position:fixed;right:7px;bottom:7px;z-index:9999;font:700 9px Arial;color:rgba(255,255,255,.7);pointer-events:none">V24</div>
+<div id="villa-build-v25" style="position:fixed;right:7px;bottom:7px;z-index:9999;font:700 9px Arial;color:rgba(255,255,255,.7);pointer-events:none">V25</div>
 
 <style id="villa-v22-report-preview-style">
 .rm-report-preview-dialog{width:min(560px,98vw)!important;max-height:96vh!important}
@@ -5961,7 +5962,7 @@ body{position:relative;isolation:isolate}
     const title=(document.getElementById('rmReportSelectedTitle')||{}).textContent||'Relatório';
     const from=(document.getElementById('rmReportFrom')||{}).value||'';
     const to=(document.getElementById('rmReportTo')||{}).value||'';
-    sheet.innerHTML=`<div class="rm-print-head"><img src="villa-kids-logo-transparente.png?v=24" alt="Villa Kids Parque"><h2>${typeof esc==='function'?esc(title):title}</h2><div class="rm-print-period">Período: ${brDate(from)} a ${brDate(to)} • Gerado em ${new Date().toLocaleString('pt-BR')}</div></div><div class="rm-print-body">${src.innerHTML}</div>`;
+    sheet.innerHTML=`<div class="rm-print-head"><img src="villa-kids-logo-transparente.png?v=25" alt="Villa Kids Parque"><h2>${typeof esc==='function'?esc(title):title}</h2><div class="rm-print-period">Período: ${brDate(from)} a ${brDate(to)} • Gerado em ${new Date().toLocaleString('pt-BR')}</div></div><div class="rm-print-body">${src.innerHTML}</div>`;
     document.getElementById('rmReportPreviewModal').classList.add('open');
   };
   window.rmPrintCurrentReportDirect=window.rmOpenReportPrintPreview;
@@ -6012,21 +6013,42 @@ body{position:relative;isolation:isolate}
 
 
 
-<style id="villa-v24-welcome-style">
+<script id="villa-v25-event-balance">
+(function(){
+ window.vkUpdateEventBalance=function(){
+  var total=Number((document.getElementById('rmEventTotal')||{}).value||0);
+  var deposit=Number((document.getElementById('rmEventDeposit')||{}).value||0);
+  var id=(document.getElementById('rmEventId')||{}).value||'';
+  var ev=(window.db&&Array.isArray(db.events))?db.events.find(function(x){return x.id===id;}):null;
+  var hist=ev&&Array.isArray(ev.payments)?ev.payments:[];
+  var histReceived=hist.reduce(function(a,p){return a+Number(p.received||p.amount||0)},0);
+  var discounts=hist.reduce(function(a,p){return a+Number(p.discount||0)},0);
+  var realized=String((document.getElementById('rmEventStatus')||{}).value||'').toLowerCase()==='realizada';
+  var bal=realized?0:Math.max(0,total-discounts-histReceived-deposit);
+  var box=document.getElementById('vkEventBalanceBox');
+  if(box)box.textContent='💰 Falta receber: '+(typeof money==='function'?money(bal):('R$ '+bal.toFixed(2).replace('.',',')));
+ };
+ document.addEventListener('change',function(e){if(e.target&&e.target.id==='rmEventStatus')vkUpdateEventBalance();});
+ var oldNew=window.rmNewEvent,oldEdit=window.rmEditEvent;
+ if(typeof oldNew==='function')window.rmNewEvent=function(){var r=oldNew.apply(this,arguments);setTimeout(vkUpdateEventBalance,0);return r};
+ if(typeof oldEdit==='function')window.rmEditEvent=function(){var r=oldEdit.apply(this,arguments);setTimeout(vkUpdateEventBalance,0);return r};
+})();
+</script>
+
+<style id="villa-v25-welcome-style">
 #vkWelcomeOverlay{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(0,76,126,.38);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
 #vkWelcomeOverlay[hidden]{display:none!important}.vk-welcome-card{width:min(430px,92vw);background:#fff;border-radius:24px;padding:30px 24px 24px;text-align:center;box-shadow:0 20px 55px rgba(0,63,105,.24)}
 .vk-welcome-logo{width:min(210px,62vw);max-height:130px;object-fit:contain;margin:0 auto 10px;display:block}.vk-welcome-card h2{margin:6px 0 8px;color:#064c9d;font-size:25px}.vk-welcome-card p{margin:0 0 20px;color:#3c5262;font-size:17px;line-height:1.45}.vk-welcome-card button{width:100%;min-height:52px;border:0;border-radius:12px;background:linear-gradient(90deg,#08a8cf,#064c9d);color:#fff;font-size:17px;font-weight:850}.vk-welcome-tag{font-size:12px;font-weight:800;letter-spacing:.8px;color:#10a7b3;margin-bottom:3px}
 </style>
 <div id="vkWelcomeOverlay" hidden role="dialog" aria-modal="true" aria-labelledby="vkWelcomeTitle">
  <div class="vk-welcome-card">
-  <img class="vk-welcome-logo" src="villa-kids-logo-transparente.png?v=24" alt="Villa Kids Parque">
-  <div class="vk-welcome-tag">DIVERSÃO • ALEGRIA • MEMÓRIAS</div>
+  <img class="vk-welcome-logo" src="villa-kids-logo-transparente.png?v=25" alt="Villa Kids Parque">
   <h2 id="vkWelcomeTitle">Seja bem-vinda!</h2>
   <p id="vkWelcomeText">Que seja um ótimo dia de trabalho! 💙</p>
   <button id="vkWelcomeBtn" type="button">COMEÇAR</button>
  </div>
 </div>
-<script id="villa-v24-welcome">
+<script id="villa-v25-welcome">
 (function(){
  function showWelcome(){
   var flag=false; try{flag=localStorage.getItem('villa_kids_show_welcome')==='1';}catch(e){}
