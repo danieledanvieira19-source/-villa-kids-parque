@@ -13,7 +13,7 @@
 </head><body>
 <div class="decor" aria-hidden="true"><span class="d1">☆</span><span class="d2">☁</span><span class="d3">☆</span><span class="d4">○</span><span class="d5">♢</span><span class="d6">☆</span></div>
 <form class="login" id="loginForm" autocomplete="on">
-<img class="logo" src="villa-kids-logo-transparente.png?v=21" alt="Villa Kids Parque">
+<img class="logo" src="villa-kids-logo-transparente.png?v=22" alt="Villa Kids Parque">
 <h1>Villa Kids Parque Sistema</h1><div class="subtitle">Controle e gestão do espaço infantil</div>
 <div class="field"><span class="ico">♙</span><input id="user" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Usuário" type="text"></div>
 <div class="field"><span class="ico">▣</span><input id="pass" autocomplete="current-password" placeholder="Senha" type="password"><button class="eye" id="eye" type="button" aria-label="Mostrar senha">◉</button></div>
@@ -35,7 +35,7 @@
       if(!r.ok)throw new Error(body.error||'Usuário ou senha incorretos.');
       localStorage.setItem('villa_kids_cloud_token',body.token);
       localStorage.setItem('villa_kids_session',JSON.stringify(body.user));
-      location.replace('app.html?v=21');
+      location.replace('app.html?v=22');
     }catch(err){m.textContent=(err&&err.message)||'Não foi possível conectar. Verifique a internet.';btn.disabled=false;btn.textContent=old;}
     return false;
   };
