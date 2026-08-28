@@ -1090,13 +1090,13 @@ body{background:radial-gradient(circle at 8% 8%,rgba(32,184,205,.22),transparent
 <!-- V9 LOGIN FIXO: logo embutida + cores Villa Kids + Safari -->
 
 
-<meta content="V23-WELCOME-80MM" name="villa-kids-build"/><script id="villa-v12-local-bootstrap">
+<meta content="V24-WELCOME-FIX" name="villa-kids-build"/><script id="villa-v12-local-bootstrap">
 window.RECREAMOR_CLOUD={enabled:false,supabaseUrl:"",supabaseKey:"",stateId:"villa-kids-local"};
 window.rmSupabase=null;
 (function(){
   function getSession(){try{return JSON.parse(localStorage.getItem("villa_kids_session")||"null")}catch(e){return null}}
   var s=getSession();
-  if(!s||!s.nome||!s.role){location.replace("index.html?v=23");return;}
+  if(!s||!s.nome||!s.role){location.replace("index.html?v=24");return;}
   window.RECREAMOR_USUARIO_ATUAL=s;
   document.addEventListener("DOMContentLoaded",function(){
     try{
@@ -1119,7 +1119,7 @@ window.rmSupabase=null;
   },{once:true});
 })();
 </script><script id="villa-v12-account-actions">
-window.rmSair=function(){try{localStorage.removeItem("villa_kids_session")}catch(e){} location.replace("index.html?v=23")};
+window.rmSair=function(){try{localStorage.removeItem("villa_kids_session")}catch(e){} location.replace("index.html?v=24")};
 window.rmTrocarConta=window.rmSair;
 window.rmToggleUserMenu=function(e){if(e)e.stopPropagation();var d=document.getElementById("rmUserMenuDrop");if(d)d.classList.toggle("open")};
 </script>
@@ -1133,7 +1133,7 @@ window.rmToggleUserMenu=function(e){if(e)e.stopPropagation();var d=document.getE
   window.VILLA_CLOUD=CFG;
   let applying=false, dirty=false, timer=null, lastRemote=0, pulling=false, initialized=false;
   function token(){try{return localStorage.getItem('villa_kids_cloud_token')||''}catch(e){return ''}}
-  function hardLogout(){try{localStorage.removeItem('villa_kids_cloud_token');localStorage.removeItem('villa_kids_session')}catch(e){} location.replace('index.html?v=23')}
+  function hardLogout(){try{localStorage.removeItem('villa_kids_cloud_token');localStorage.removeItem('villa_kids_session')}catch(e){} location.replace('index.html?v=24')}
   window.villaCloudApi=async function(action,payload){
     const headers={'Content-Type':'application/json','apikey':CFG.key};
     const t=token(); if(t)headers['x-villa-token']=t;
@@ -6010,7 +6010,39 @@ body{position:relative;isolation:isolate}
 })();
 </script>
 
-\n<style id="villa-v23-welcome-style">\n#vkWelcomeOverlay{position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(0,76,126,.34);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}\n#vkWelcomeOverlay[hidden]{display:none!important}.vk-welcome-card{width:min(430px,92vw);background:#fff;border-radius:24px;padding:30px 24px 24px;text-align:center;box-shadow:0 20px 55px rgba(0,63,105,.24);border:1px solid rgba(255,255,255,.8)}\n.vk-welcome-logo{width:min(210px,62vw);max-height:130px;object-fit:contain;margin:0 auto 10px;display:block}.vk-welcome-card h2{margin:6px 0 8px;color:#064c9d;font-size:25px}.vk-welcome-card p{margin:0 0 20px;color:#3c5262;font-size:17px;line-height:1.45}.vk-welcome-card button{width:100%;min-height:52px;border:0;border-radius:12px;background:linear-gradient(90deg,#08a8cf,#064c9d);color:#fff;font-size:17px;font-weight:850}.vk-welcome-tag{font-size:12px;font-weight:800;letter-spacing:.8px;color:#10a7b3;margin-bottom:3px}\n</style>\n<div id="vkWelcomeOverlay" hidden role="dialog" aria-modal="true" aria-labelledby="vkWelcomeTitle">\n  <div class="vk-welcome-card">\n    <img class="vk-welcome-logo" src="villa-kids-logo-transparente.png?v=23" alt="Villa Kids Parque">\n    <div class="vk-welcome-tag">DIVERSÃO • ALEGRIA • MEMÓRIAS</div>\n    <h2 id="vkWelcomeTitle">Seja bem-vinda!</h2>\n    <p id="vkWelcomeText">Bom trabalho! 💙</p>\n    <button id="vkWelcomeBtn" type="button">COMEÇAR</button>\n  </div>\n</div>\n<script id="villa-v23-welcome">\n(function(){\n  function initWelcome(){\n    var show=false;try{show=localStorage.getItem('villa_kids_show_welcome')==='1';if(show)localStorage.removeItem('villa_kids_show_welcome')}catch(e){}\n    if(!show)return;\n    var sess={};try{sess=JSON.parse(localStorage.getItem('villa_kids_session')||'{}')||{}}catch(e){}\n    var ov=document.getElementById('vkWelcomeOverlay'),title=document.getElementById('vkWelcomeTitle'),text=document.getElementById('vkWelcomeText'),btn=document.getElementById('vkWelcomeBtn');\n    if(!ov)return;\n    var tr=String(sess.tratamento||'tia').toLowerCase()==='tio'?'Tio':'Tia';\n    var nome=String(sess.nome||sess.usuario||'').replace(/^ti[oa]\\s+/i,'').trim();\n    title.textContent='Seja bem-vind'+(tr==='Tia'?'a':'o')+', '+tr+(nome?' '+nome:'')+'!';\n    text.textContent='Que seja um ótimo dia de trabalho! 💙';\n    ov.hidden=false;\n    function close(){ov.hidden=true}\n    btn&&btn.addEventListener('click',close,{once:true});\n  }\n  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initWelcome,{once:true});else initWelcome();\n})();\n</script>\n
+
+
+<style id="villa-v24-welcome-style">
+#vkWelcomeOverlay{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(0,76,126,.38);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
+#vkWelcomeOverlay[hidden]{display:none!important}.vk-welcome-card{width:min(430px,92vw);background:#fff;border-radius:24px;padding:30px 24px 24px;text-align:center;box-shadow:0 20px 55px rgba(0,63,105,.24)}
+.vk-welcome-logo{width:min(210px,62vw);max-height:130px;object-fit:contain;margin:0 auto 10px;display:block}.vk-welcome-card h2{margin:6px 0 8px;color:#064c9d;font-size:25px}.vk-welcome-card p{margin:0 0 20px;color:#3c5262;font-size:17px;line-height:1.45}.vk-welcome-card button{width:100%;min-height:52px;border:0;border-radius:12px;background:linear-gradient(90deg,#08a8cf,#064c9d);color:#fff;font-size:17px;font-weight:850}.vk-welcome-tag{font-size:12px;font-weight:800;letter-spacing:.8px;color:#10a7b3;margin-bottom:3px}
+</style>
+<div id="vkWelcomeOverlay" hidden role="dialog" aria-modal="true" aria-labelledby="vkWelcomeTitle">
+ <div class="vk-welcome-card">
+  <img class="vk-welcome-logo" src="villa-kids-logo-transparente.png?v=24" alt="Villa Kids Parque">
+  <div class="vk-welcome-tag">DIVERSÃO • ALEGRIA • MEMÓRIAS</div>
+  <h2 id="vkWelcomeTitle">Seja bem-vinda!</h2>
+  <p id="vkWelcomeText">Que seja um ótimo dia de trabalho! 💙</p>
+  <button id="vkWelcomeBtn" type="button">COMEÇAR</button>
+ </div>
+</div>
+<script id="villa-v24-welcome">
+(function(){
+ function showWelcome(){
+  var flag=false; try{flag=localStorage.getItem('villa_kids_show_welcome')==='1';}catch(e){}
+  if(!flag)return;
+  var sess={}; try{sess=JSON.parse(localStorage.getItem('villa_kids_session')||'{}')||{};}catch(e){}
+  var ov=document.getElementById('vkWelcomeOverlay'); if(!ov)return;
+  var tr=String(sess.tratamento||'tia').toLowerCase()==='tio'?'Tio':'Tia';
+  var nome=String(sess.nome||sess.usuario||'').replace(/^ti[oa]\s+/i,'').trim();
+  var title=document.getElementById('vkWelcomeTitle');
+  if(title)title.textContent='Seja bem-vind'+(tr==='Tia'?'a':'o')+', '+tr+(nome?' '+nome:'')+'!';
+  ov.hidden=false;
+  var btn=document.getElementById('vkWelcomeBtn'); if(btn)btn.onclick=function(){ov.hidden=true;try{localStorage.removeItem('villa_kids_show_welcome')}catch(e){}};
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',showWelcome,{once:true});else setTimeout(showWelcome,0);
+})();
+</script>
 </body>
 </html>
 <style id="villa-v18-timer-stable">
