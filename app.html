@@ -1090,13 +1090,13 @@ body{background:radial-gradient(circle at 8% 8%,rgba(32,184,205,.22),transparent
 <!-- V9 LOGIN FIXO: logo embutida + cores Villa Kids + Safari -->
 
 
-<meta content="V33-DESKTOP-MARIA" name="villa-kids-build"/><script id="villa-v12-local-bootstrap">
+<meta content="V34-DESKTOP-MARIA" name="villa-kids-build"/><script id="villa-v12-local-bootstrap">
 window.RECREAMOR_CLOUD={enabled:false,supabaseUrl:"",supabaseKey:"",stateId:"villa-kids-local"};
 window.rmSupabase=null;
 (function(){
   function getSession(){try{return JSON.parse(localStorage.getItem("villa_kids_session")||"null")}catch(e){return null}}
   var s=getSession();
-  if(!s||!s.nome||!s.role){location.replace("index.html?v=33");return;}
+  if(!s||!s.nome||!s.role){location.replace("index.html?v=34");return;}
   if(String(s.usuario||"").toLowerCase()==="admin"){s.nome="Maria";try{localStorage.setItem("villa_kids_session",JSON.stringify(s))}catch(e){}}
   window.RECREAMOR_USUARIO_ATUAL=s;
   document.addEventListener("DOMContentLoaded",function(){
@@ -1120,7 +1120,7 @@ window.rmSupabase=null;
   },{once:true});
 })();
 </script><script id="villa-v12-account-actions">
-window.rmSair=function(){try{localStorage.removeItem("villa_kids_session")}catch(e){} location.replace("index.html?v=33")};
+window.rmSair=function(){try{localStorage.removeItem("villa_kids_session")}catch(e){} location.replace("index.html?v=34")};
 window.rmTrocarConta=window.rmSair;
 window.rmToggleUserMenu=function(e){if(e)e.stopPropagation();var d=document.getElementById("rmUserMenuDrop");if(d)d.classList.toggle("open")};
 </script>
@@ -1134,7 +1134,7 @@ window.rmToggleUserMenu=function(e){if(e)e.stopPropagation();var d=document.getE
   window.VILLA_CLOUD=CFG;
   let applying=false, dirty=false, timer=null, lastRemote=0, pulling=false, initialized=false;
   function token(){try{return localStorage.getItem('villa_kids_cloud_token')||''}catch(e){return ''}}
-  function hardLogout(){try{localStorage.removeItem('villa_kids_cloud_token');localStorage.removeItem('villa_kids_session')}catch(e){} location.replace('index.html?v=33')}
+  function hardLogout(){try{localStorage.removeItem('villa_kids_cloud_token');localStorage.removeItem('villa_kids_session')}catch(e){} location.replace('index.html?v=34')}
   window.villaCloudApi=async function(action,payload){
     const headers={'Content-Type':'application/json','apikey':CFG.key};
     const t=token(); if(t)headers['x-villa-token']=t;
@@ -1257,7 +1257,7 @@ body{min-height:100vh!important;background:linear-gradient(180deg,#08a9d5 0%,#07
 </head>
 <body>
 <div class="villa-system-decor" aria-hidden="true"><span>☆</span><span>☁</span><span>☆</span><span>○</span><span>♢</span><span>☆</span><span>☁</span><span>☆</span></div>
-<div id="villaVersionBadge">V33</div>
+<div id="villaVersionBadge">V34</div>
 
 
 
@@ -1292,7 +1292,7 @@ body{min-height:100vh!important;background:linear-gradient(180deg,#08a9d5 0%,#07
 <button data-filter="paused">Pausadas</button>
 </div>
 <div class="rm-mobile-list" id="rmMobileList"></div>
-</section><div class="top"><div class="logo-wrap"><img alt="Logo Villa Kids" src="villa-kids-logo-redonda.png?v=33"/></div><div class="date" id="dateBox"></div></div>
+</section><div class="top"><div class="logo-wrap"><img alt="Logo Villa Kids" src="villa-kids-logo-redonda.png?v=34"/></div><div class="date" id="dateBox"></div></div>
 <div class="rm-home-event-alerts rm-home-event-alerts-desktop" id="rmHomeEventAlertsDesktop"></div>
 <section class="stats"><div class="stat blue"><div class="icon">👥</div><div><small>Crianças Ativas</small><strong id="activeCount">0</strong><small>Agora no espaço</small></div></div><div class="stat orange"><div class="icon">⏸</div><div><small>Pausadas</small><strong id="pausedCount">0</strong><small>No momento</small></div></div><div class="stat green"><div class="icon">↪</div><div><small>Saídas de Hoje</small><strong id="exitCount">0</strong><small>Total do dia</small></div></div><div class="stat purple"><div class="icon">$</div><div><small>Faturamento Hoje</small><strong id="revenue">R$ 0,00</strong><small>Atendimentos + vendas</small></div></div><div class="stat blue"><div class="icon">👥</div><div><small>Usuários</small><strong id="usersCount">3</strong><small>Ativos</small></div></div></section>
 <section class="content"><div class="card" id="activeCard"><h3 style="color:#1675e8">👥 Crianças Ativas Agora</h3><div class="rows" id="activeRows"></div></div><div class="card" id="pausedCard"><h3 style="color:#ff7a00">⏸ Crianças Pausadas</h3><div class="rows" id="pausedRows"></div></div></section>
@@ -5929,7 +5929,7 @@ body{position:relative;isolation:isolate}
   }
 })();
 </script>
-<div id="villa-build-v26" style="position:fixed;right:7px;bottom:7px;z-index:9999;font:700 9px Arial;color:rgba(255,255,255,.7);pointer-events:none">V33</div>
+<div id="villa-build-v26" style="position:fixed;right:7px;bottom:7px;z-index:9999;font:700 9px Arial;color:rgba(255,255,255,.7);pointer-events:none">V34</div>
 
 <style id="villa-v22-report-preview-style">
 .rm-report-preview-dialog{width:min(560px,98vw)!important;max-height:96vh!important}
@@ -5973,7 +5973,7 @@ body{position:relative;isolation:isolate}
     const title=(document.getElementById('rmReportSelectedTitle')||{}).textContent||'Relatório';
     const from=(document.getElementById('rmReportFrom')||{}).value||'';
     const to=(document.getElementById('rmReportTo')||{}).value||'';
-    sheet.innerHTML=`<div class="rm-print-head"><img src="villa-kids-logo-transparente.png?v=33" alt="Villa Kids Parque"><h2>${typeof esc==='function'?esc(title):title}</h2><div class="rm-print-period">Período: ${brDate(from)} a ${brDate(to)} • Gerado em ${new Date().toLocaleString('pt-BR')}</div></div><div class="rm-print-body">${src.innerHTML}</div>`;
+    sheet.innerHTML=`<div class="rm-print-head"><img src="villa-kids-logo-transparente.png?v=34" alt="Villa Kids Parque"><h2>${typeof esc==='function'?esc(title):title}</h2><div class="rm-print-period">Período: ${brDate(from)} a ${brDate(to)} • Gerado em ${new Date().toLocaleString('pt-BR')}</div></div><div class="rm-print-body">${src.innerHTML}</div>`;
     document.getElementById('rmReportPreviewModal').classList.add('open');
   };
   window.rmPrintCurrentReportDirect=window.rmOpenReportPrintPreview;
@@ -6053,7 +6053,7 @@ body{position:relative;isolation:isolate}
 </style>
 <div id="vkWelcomeOverlay" hidden role="dialog" aria-modal="true" aria-labelledby="vkWelcomeTitle">
  <div class="vk-welcome-card">
-  <img class="vk-welcome-logo" src="villa-kids-logo-transparente.png?v=33" alt="Villa Kids Parque">
+  <img class="vk-welcome-logo" src="villa-kids-logo-transparente.png?v=34" alt="Villa Kids Parque">
   <h2 id="vkWelcomeTitle">Seja bem-vinda!</h2>
   <p id="vkWelcomeText">Que seja um ótimo dia de trabalho! 💙</p>
   <button id="vkWelcomeBtn" type="button">COMEÇAR</button>
@@ -6078,7 +6078,7 @@ body{position:relative;isolation:isolate}
 </script>
 
 <style id="villa-v28-desktop-cleanup">
-/* V33: tela de computador mais limpa */
+/* V34: tela de computador mais limpa */
 @media(min-width:768px){
   .rm-settings-fab,.rm-events-fab,.rm-reports-fab,#rmRealtimeStatus{display:none!important;visibility:hidden!important;pointer-events:none!important}
 
@@ -6187,5 +6187,17 @@ body{position:relative;isolation:isolate}
 <style id="vk-v30-desktop-only-floating">
 @media (min-width:768px){
   .rm-settings-fab,.rm-events-fab,.rm-reports-fab,#rmRealtimeStatus{display:none!important;visibility:hidden!important;pointer-events:none!important}
+}
+</style>
+<style id="vk-v34-mobile-floating-final">
+/* V34: mobile mantém apenas Festas + Relatórios flutuantes; Configurações fica exclusiva do desktop */
+@media (max-width:767px){
+  .rm-settings-fab{display:none!important;visibility:hidden!important;pointer-events:none!important}
+  body.rm-is-admin .rm-events-fab,
+  body.rm-is-admin .rm-reports-fab{display:flex!important;visibility:visible!important;pointer-events:auto!important}
+}
+@media (min-width:768px){
+  .rm-settings-fab,.rm-events-fab,.rm-reports-fab,#rmRealtimeStatus{display:none!important;visibility:hidden!important;pointer-events:none!important}
+  #vkDesktopSettingsBtn{display:inline-flex!important;visibility:visible!important;pointer-events:auto!important}
 }
 </style>
