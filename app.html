@@ -1096,7 +1096,7 @@ window.rmSupabase=null;
 (function(){
   function getSession(){try{return JSON.parse(localStorage.getItem("villa_kids_session")||"null")}catch(e){return null}}
   var s=getSession();
-  if(!s||!s.nome||!s.role){location.replace("index.html?v=50");return;}
+  if(!s||!s.nome||!s.role){location.replace("index.html?v=52");return;}
   if(String(s.usuario||"").toLowerCase()==="admin"){s.nome="Maria";try{localStorage.setItem("villa_kids_session",JSON.stringify(s))}catch(e){}}
   window.RECREAMOR_USUARIO_ATUAL=s;
   document.addEventListener("DOMContentLoaded",function(){
@@ -1120,7 +1120,7 @@ window.rmSupabase=null;
   },{once:true});
 })();
 </script><script id="villa-v12-account-actions">
-window.rmSair=function(){try{localStorage.removeItem("villa_kids_session")}catch(e){} location.replace("index.html?v=50")};
+window.rmSair=function(){try{localStorage.removeItem("villa_kids_session")}catch(e){} location.replace("index.html?v=52")};
 window.rmTrocarConta=window.rmSair;
 window.rmToggleUserMenu=function(e){if(e)e.stopPropagation();var d=document.getElementById("rmUserMenuDrop");if(d)d.classList.toggle("open")};
 </script>
@@ -1133,8 +1133,53 @@ window.rmToggleUserMenu=function(e){if(e)e.stopPropagation();var d=document.getE
   };
   window.VILLA_CLOUD=CFG;
   let applying=false, dirty=false, timer=null, lastRemote=0, pulling=false, initialized=false;
+  const BASELINE_KEY='villa-kids-last-synced-v1';
+  const OFFLINE_KEY='villa-kids-offline-pending-v1';
+  function clone(v){try{return JSON.parse(JSON.stringify(v||{}))}catch(e){return {}}}
+  function readStore(k,fallback){try{return JSON.parse(localStorage.getItem(k)||'null')??fallback}catch(e){return fallback}}
+  function writeStore(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+  function markPending(v){writeStore(OFFLINE_KEY,{pending:true,at:Date.now(),data:clone(v)})}
+  function clearPending(){try{localStorage.removeItem(OFFLINE_KEY)}catch(e){}}
+  function same(a,b){try{return JSON.stringify(a)===JSON.stringify(b)}catch(e){return false}}
+  function recStamp(x){return Number(x&& (x.updatedAt||x.exitedAt||x.chargedAt||x.canceledAt||x.leftAt||x.enteredAt||x.createdAt||x.at))||0}
+  function mergeArray(local,remote,baseline){
+    const L=Array.isArray(local)?local:[], R=Array.isArray(remote)?remote:[], B=Array.isArray(baseline)?baseline:[];
+    const lm=new Map(L.filter(x=>x&&x.id!=null).map(x=>[String(x.id),x]));
+    const rm=new Map(R.filter(x=>x&&x.id!=null).map(x=>[String(x.id),x]));
+    const bm=new Map(B.filter(x=>x&&x.id!=null).map(x=>[String(x.id),x]));
+    const ids=new Set([...lm.keys(),...rm.keys(),...bm.keys()]); const out=[];
+    ids.forEach(id=>{
+      const l=lm.get(id), r=rm.get(id), b=bm.get(id);
+      if(l&&!r){out.push(l);return} if(!l&&r){out.push(r);return}
+      const lc=!!l&&!same(l,b), rc=!!r&&!same(r,b);
+      if(lc&&!rc){out.push(l);return} if(!lc&&rc){out.push(r);return}
+      if(!lc&&!rc){out.push(r||l);return}
+      // Both devices changed the same record. Prefer the newer explicit timestamp.
+      // If there is no trustworthy timestamp, keep the local record rather than silently erasing a local operation.
+      out.push(recStamp(l)>=recStamp(r)?l:r);
+    });
+    return out;
+  }
+  function mergeState(local,remote){
+    const l=clone(local), r=clone(remote), b=readStore(BASELINE_KEY,{});
+    const out=clone(r);
+    ['sessions','exits','canceled','products','sales','customers','events'].forEach(k=>{out[k]=mergeArray(l[k],r[k],b[k]);});
+    // Cash history is append-only by entry id; merge it independently so two devices cannot erase movements.
+    out.cash=Object.assign({},r.cash||{},l.cash||{});
+    out.cash.history=mergeArray((l.cash||{}).history,(r.cash||{}).history,(b.cash||{}).history);
+    const lc=(l.cash||{}).updatedAt||0, rc=(r.cash||{}).updatedAt||0, bc=(b.cash||{}).updatedAt||0;
+    if(lc&&lc!==bc && (!rc||rc===bc||lc>=rc)) out.cash=Object.assign({},out.cash,l.cash);
+    else if(rc) out.cash=Object.assign({},out.cash,r.cash);
+    // Settings/users are scalar-ish; use updatedAt when available, otherwise prefer local only if it changed from baseline.
+    ['settings','users'].forEach(k=>{
+      if(!l[k]&&!r[k])return;
+      const lc=!!l[k]&&!same(l[k],b[k]), rc=!!r[k]&&!same(r[k],b[k]);
+      if(lc&&!rc)out[k]=l[k]; else if(!lc&&rc)out[k]=r[k]; else if(lc&&rc)out[k]=l[k]; else out[k]=r[k]??l[k];
+    });
+    return out;
+  }
   function token(){try{return localStorage.getItem('villa_kids_cloud_token')||''}catch(e){return ''}}
-  function hardLogout(){try{localStorage.removeItem('villa_kids_cloud_token');localStorage.removeItem('villa_kids_session')}catch(e){} location.replace('index.html?v=50')}
+  function hardLogout(){try{localStorage.removeItem('villa_kids_cloud_token');localStorage.removeItem('villa_kids_session')}catch(e){} location.replace('index.html?v=52')}
   window.villaCloudApi=async function(action,payload){
     const headers={'Content-Type':'application/json','apikey':CFG.key};
     const t=token(); if(t)headers['x-villa-token']=t;
@@ -1159,11 +1204,25 @@ window.rmToggleUserMenu=function(e){if(e)e.stopPropagation();var d=document.getE
   }
   async function push(data){
     if(applying)return;
-    dirty=true;
+    dirty=true; markPending(data);
     try{
-      const r=await window.villaCloudApi('save_state',{data:data});
+      // Before writing, fetch the current cloud state and merge only the records
+      // that changed locally since the last successful sync. This prevents an
+      // offline device from overwriting another device's newer records.
+      let payload=clone(data);
+      try{
+        const remote=await window.villaCloudApi('get_state');
+        if(remote&&remote.data&&meaningful(remote.data)) payload=mergeState(payload,remote.data);
+      }catch(e){
+        // No network: keep the local state. It remains marked pending for retry.
+        throw e;
+      }
+      const r=await window.villaCloudApi('save_state',{data:payload});
       lastRemote=Math.max(lastRemote,Date.parse(r.updated_at||0)||Date.now());
-      dirty=false;
+      writeStore(BASELINE_KEY,payload); clearPending(); dirty=false;
+      if(typeof db!=='undefined' && !same(db,payload)){
+        applying=true; db=normalize(payload); try{localStorage.setItem('villa-kids-manager-data-v1',JSON.stringify(db))}catch(e){} applying=false; refreshUI();
+      }
       return true;
     }catch(e){console.warn('Villa cloud save:',e);return false;}
   }
@@ -1196,6 +1255,8 @@ window.rmToggleUserMenu=function(e){if(e)e.stopPropagation();var d=document.getE
         db=(typeof normalize==='function'?normalize(remote):remote);
         try{localStorage.setItem('villa-kids-manager-data-v1',JSON.stringify(db))}catch(e){}
         lastRemote=ts;
+        writeStore(BASELINE_KEY,db);
+        clearPending();
         applying=false;
         refreshUI();
       }
@@ -1204,7 +1265,7 @@ window.rmToggleUserMenu=function(e){if(e)e.stopPropagation();var d=document.getE
   }
   document.addEventListener('DOMContentLoaded',function(){
     setTimeout(()=>pull(true),180);
-    setInterval(()=>{if(initialized)pull(false)},2500);
+    setInterval(()=>{if(initialized){const pending=readStore(OFFLINE_KEY,null); if(pending&&pending.pending&&typeof db!=='undefined'&&!pulling&&!applying) push(db); else pull(false)}},2500);
   },{once:true});
   const oldSair=window.rmSair;
   window.rmSair=async function(){
@@ -1714,7 +1775,19 @@ body{min-height:100vh!important;background:linear-gradient(180deg,#08a9d5 0%,#07
 const KEY='villa-kids-manager-data-v1';
 let db=load(); let currentExit=null;
 function emptyDB(){return{sessions:[],exits:[],products:[],sales:[],customers:[],canceled:[],cash:{open:false,openedAt:null,openingAmount:0,closedAt:null,closingAmount:null,history:[]}}}
-function normalize(x){const d=emptyDB();return Object.assign(d,x||{},{cash:Object.assign(d.cash,(x||{}).cash||{})})}
+function villaNormalizePaymentName(v){const x=String(v==null?'':' '+v).trim().toLowerCase();if(x==='pix')return 'Pix';if(x==='dinheiro')return 'Dinheiro';if(x==='debito'||x==='débito')return 'Débito';if(x==='credito'||x==='crédito')return 'Crédito';if(x==='cortesia')return 'Cortesia';return String(v==null?'':v).trim()}
+function villaSplitObject(split){
+  const out={};
+  if(Array.isArray(split)){split.forEach(x=>{const k=villaNormalizePaymentName(x&&x.method);const v=Number(x&&x.value||0);if(k&&Number.isFinite(v)&&v>0)out[k]=(out[k]||0)+v;});}
+  else if(split&&typeof split==='object'){Object.entries(split).forEach(([k,v])=>{const nk=villaNormalizePaymentName(k),nv=Number(v||0);if(nk&&Number.isFinite(nv)&&nv>0)out[nk]=(out[nk]||0)+nv;});}
+  return out;
+}
+function villaRepairFinancialSplits(d){
+  let changed=false;
+  ;[...(d.sessions||[]),...(d.exits||[]),...(d.sales||[])].forEach(r=>{if(r&&r.paymentSplit){const n=villaSplitObject(r.paymentSplit);if(JSON.stringify(n)!==JSON.stringify(r.paymentSplit)){r.paymentSplit=n;changed=true;}}});
+  return changed;
+}
+function normalize(x){const d=emptyDB();const out=Object.assign(d,x||{},{cash:Object.assign(d.cash,(x||{}).cash||{})});villaRepairFinancialSplits(out);return out}
 function load(){try{return normalize(JSON.parse(localStorage.getItem(KEY)))}catch(e){return emptyDB()}}
 function save(){
   localStorage.setItem(KEY,JSON.stringify(db));
@@ -1850,10 +1923,26 @@ function openReturnPicker(){openPicker('Retornar Criança',db.sessions.filter(s=
 function pickReturn(id){closeModal('pickerModal');returnSession(id)}
 function openExitPicker(){openPicker('Registrar Saída',db.sessions,'Ver resumo e finalizar','pickExit')}
 function villaParseMoney(v){return Number(String(v||'0').replace(/\./g,'').replace(',','.'))||0}
+function villaAllocateGroupSplit(splitObj,childTotals){
+  const methods=Object.keys(splitObj||{});
+  const totalCents=Math.round(childTotals.reduce((a,v)=>a+Number(v||0),0)*100);
+  const remaining={};methods.forEach(k=>remaining[k]=Math.round(Number(splitObj[k]||0)*100));
+  let remainingTotal=totalCents;
+  return childTotals.map((raw,idx)=>{
+    const target=idx===childTotals.length-1?remainingTotal:Math.round(Number(raw||0)*100);
+    const row={};let assigned=0;
+    if(idx===childTotals.length-1){methods.forEach(k=>{if(remaining[k]>0){row[k]=remaining[k]/100;assigned+=remaining[k];remaining[k]=0;}});remainingTotal=0;return row;}
+    methods.forEach(k=>{const share=remainingTotal>0?Math.floor(remaining[k]*target/remainingTotal):0;row[k]=share/100;remaining[k]-=share;assigned+=share;});
+    let residual=target-assigned;
+    while(residual>0){const k=methods.slice().sort((a,b)=>(remaining[b]||0)-(remaining[a]||0))[0];if(!k||!(remaining[k]>0))break;row[k]=(row[k]||0)+0.01;remaining[k]-=1;residual--;}
+    remainingTotal-=target;
+    return row;
+  });
+}
 function villaExitPaymentChanged(){const method=(document.getElementById('exitPayment')||{}).value||'';document.getElementById('villaCashReceivedWrap').style.display=method==='Dinheiro'?'block':'none';document.getElementById('villaExitMixed').style.display=method==='Mista'?'block':'none';villaUpdateExitPayment()}
 function villaUpdateExitPayment(){const s=db.sessions.find(x=>x.id===currentExit);if(!s)return;const p=villaPriceFor(s),total=Number(window.villaGroupExitTotal||p.total),method=(document.getElementById('exitPayment')||{}).value||'';let text='Selecione a forma de pagamento.';if(method==='Dinheiro'){const got=villaParseMoney(document.getElementById('villaCashReceived').value);text=`Total: ${money(total)} • Recebido: ${money(got)} • Troco: ${money(Math.max(0,got-total))}`;}else if(method==='Mista'){const vals=[...document.querySelectorAll('#villaExitMixed [data-villa-mixed]')].map(i=>({method:i.dataset.villaMixed,value:villaParseMoney(i.value)})).filter(x=>x.value>0);const sum=vals.reduce((a,x)=>a+x.value,0);text=`Total: ${money(total)} • Informado: ${money(sum)} • Diferença: ${money(Math.abs(total-sum))}`;}else if(method)text=`Total a receber: ${money(total)} • ${method}`;document.getElementById('villaExitPaySummary').textContent=text}
 function pickExit(id){window.villaGroupExitTotal=null;closeModal('pickerModal');let s=db.sessions.find(x=>x.id===id);if(!s)return;currentExit=id;let p=villaPriceFor(s),paused=(s.pausedMs||0)+(s.status==='paused'?pauseElapsedMs(s):0);document.getElementById('exitSummary').innerHTML=`<div class="banner"><strong>${esc(s.name)} • Pager ${String(s.pager)}</strong><div style="margin-top:5px;color:#66708a">${villaDiscountName(s.discountRate)}</div></div><div class="summary-line"><strong>Tempo contabilizado</strong><span>${fmt(p.ms)}</span></div><div class="summary-line"><strong>Tempo em pausa</strong><span>${fmt(paused)}</span></div><div class="summary-line"><strong>Valor pelo tempo</strong><span>${money(p.gross)}</span></div><div class="summary-line"><strong>Desconto</strong><span>${Math.round(p.rate*100)}% • -${money(p.discount)}</span></div><div class="summary-line"><strong>Total a pagar</strong><span><strong>${money(p.total)}</strong></span></div>`;document.getElementById('exitPayment').value=p.total===0?'Pix':'';document.getElementById('villaCashReceived').value='';document.querySelectorAll('#villaExitMixed [data-villa-mixed]').forEach(i=>i.value='');document.getElementById('villaExitPaymentBox').style.display=p.total===0?'none':'block';document.getElementById('confirmExitBtn').style.display='block';document.getElementById('printExitPreviewBtn').style.display='none';document.getElementById('confirmExitBtn').onclick=()=>confirmExit(id);villaExitPaymentChanged();document.getElementById('exitModal').classList.add('open')}
-function confirmExit(id){let i=db.sessions.findIndex(x=>x.id===id);if(i<0)return;let s=db.sessions[i];if(window.rmRequireRecordOwner&&!rmRequireRecordOwner(s))return;let now=Date.now();let p=villaPriceFor(s,now);let payment='Cortesia',split=null,received=p.total,change=0;if(p.total>0){payment=(document.getElementById('exitPayment')||{}).value||'';if(!payment){toast('Selecione a forma de pagamento.');return;}if(payment==='Dinheiro'){received=villaParseMoney(document.getElementById('villaCashReceived').value);if(received<p.total){toast('O valor recebido não pode ser menor que o total.');return;}change=received-p.total;}if(payment==='Mista'){split=[...document.querySelectorAll('#villaExitMixed [data-villa-mixed]')].map(i=>({method:i.dataset.villaMixed,value:villaParseMoney(i.value)})).filter(x=>x.value>0);if(split.length<2){toast('Na forma mista, informe pelo menos duas formas de pagamento.');return;}const sum=split.reduce((a,x)=>a+x.value,0);if(Math.abs(sum-p.total)>.01){toast('A soma do pagamento misto precisa ser igual ao total.');return;}received=sum;}}
+function confirmExit(id){let i=db.sessions.findIndex(x=>x.id===id);if(i<0)return;let s=db.sessions[i];if(window.rmRequireRecordOwner&&!rmRequireRecordOwner(s))return;let now=Date.now();let p=villaPriceFor(s,now);let payment='Cortesia',split=null,received=p.total,change=0;if(p.total>0){payment=(document.getElementById('exitPayment')||{}).value||'';if(!payment){toast('Selecione a forma de pagamento.');return;}if(payment==='Dinheiro'){received=villaParseMoney(document.getElementById('villaCashReceived').value);if(received<p.total){toast('O valor recebido não pode ser menor que o total.');return;}change=received-p.total;}if(payment==='Mista'){const raw=[...document.querySelectorAll('#villaExitMixed [data-villa-mixed]')].map(i=>({method:i.dataset.villaMixed,value:villaParseMoney(i.value)})).filter(x=>x.value>0);const split=villaSplitObject(raw);if(Object.keys(split).length<2){toast('Na forma mista, informe pelo menos duas formas de pagamento.');return;}const sum=Object.values(split).reduce((a,x)=>a+Number(x||0),0);if(Math.abs(sum-p.total)>.01){toast('A soma do pagamento misto precisa ser igual ao total.');return;}received=sum;}}
 if(s.status==='paused'){s.pausedMs+=(now-s.pauseStarted);s.pauseStarted=null;s.status='active'}s.effectiveMs=p.ms;s.extraMinutes=Math.max(0,Math.ceil((p.ms/60000)-60));s.originalTotal=p.gross;s.discount=p.discount;s.total=p.total;s.payment=payment;s.paymentSplit=split;s.received=received;s.change=change;s.chargedAt=now;s.exitedAt=now;s.exitedBy=(window.RECREAMOR_USUARIO_ATUAL&&window.RECREAMOR_USUARIO_ATUAL.nome)||'Não identificado';s.history=s.history||[];s.history.push({at:now,action:'Atendimento encerrado e pago',by:s.exitedBy});db.exits.push({...s});if(window.rmUpdateCustomerVisit)rmUpdateCustomerVisit(s,'concluido');db.sessions.splice(i,1);save();render();document.getElementById('confirmExitBtn').style.display='none';document.getElementById('villaExitPaymentBox').style.display='none';let btn=document.getElementById('printExitPreviewBtn');btn.style.display='block';btn.onclick=()=>printExit(s);document.getElementById('exitSummary').innerHTML+=`<div class="banner"><strong>Saída concluída • ${money(s.total)} • ${esc(payment)}</strong></div>`;toast(`Saída de ${s.name} concluída.`)}
 function openProducts(){renderProducts();document.getElementById('productsModal').classList.add('open')}
 function addProduct(){let n=document.getElementById('productName').value.trim(),p=Number(document.getElementById('productPrice').value),st=Number(document.getElementById('productStock').value);if(!n||isNaN(p)){toast('Informe nome e preço do produto.');return}db.products.push({id:uid(),name:n,price:p,stock:Math.max(0,st||0)});save();document.getElementById('productName').value='';document.getElementById('productPrice').value='';document.getElementById('productStock').value='0';renderProducts();toast('Produto adicionado.')}
@@ -2054,7 +2143,7 @@ function rmTotalsForViewedCash(){
     if(seen.has(key))return;
     seen.add(key);
     const val=Number(s.basePrice||s.total||s.amount||0);
-    if(s.paymentSplit&&Object.keys(s.paymentSplit).length){Object.entries(s.paymentSplit).forEach(([k,v])=>{const pay=normPay(k);by[pay]=(by[pay]||0)+Number(v||0);});}
+    if(s.paymentSplit&&Object.keys(s.paymentSplit).length){Object.entries(villaSplitObject(s.paymentSplit)).forEach(([k,v])=>{const pay=normPay(k);by[pay]=(by[pay]||0)+Number(v||0);});}
     else {const pay=normPay(s.payment||"");by[pay]=(by[pay]||0)+val;}
   });
 
@@ -2062,7 +2151,7 @@ function rmTotalsForViewedCash(){
     if(!s||s.paymentPending)return;
     const ts=s&&(s.at||s.createdAt);
     if(!ts||todayKey(ts)!==day)return;
-    if(s.paymentSplit&&Object.keys(s.paymentSplit).length){Object.entries(s.paymentSplit).forEach(([k,v])=>{const pay=normPay(k);by[pay]=(by[pay]||0)+Number(v||0);});}
+    if(s.paymentSplit&&Object.keys(s.paymentSplit).length){Object.entries(villaSplitObject(s.paymentSplit)).forEach(([k,v])=>{const pay=normPay(k);by[pay]=(by[pay]||0)+Number(v||0);});}
     else {const pay=normPay(s.payment||"");by[pay]=(by[pay]||0)+Number(s.total||0);}
   });
 
@@ -2070,9 +2159,9 @@ function rmTotalsForViewedCash(){
     if(!m||!m.at||todayKey(m.at)!==day)return;
     const val=Number(m.amount||0);
     if(m.type==="payment_change"){
-      if(m.fromSplit&&Object.keys(m.fromSplit).length){Object.entries(m.fromSplit).forEach(([k,v])=>{by[k]=(by[k]||0)-Number(v||0);});}
+      if(m.fromSplit&&Object.keys(m.fromSplit).length){Object.entries(villaSplitObject(m.fromSplit)).forEach(([k,v])=>{by[k]=(by[k]||0)-Number(v||0);});}
       else if(m.fromPayment)by[m.fromPayment]=(by[m.fromPayment]||0)-val;
-      if(m.toSplit&&Object.keys(m.toSplit).length){Object.entries(m.toSplit).forEach(([k,v])=>{by[k]=(by[k]||0)+Number(v||0);});}
+      if(m.toSplit&&Object.keys(m.toSplit).length){Object.entries(villaSplitObject(m.toSplit)).forEach(([k,v])=>{by[k]=(by[k]||0)+Number(v||0);});}
       else if(m.toPayment)by[m.toPayment]=(by[m.toPayment]||0)+val;
     }else if(m.type==="refund"&&m.payment){
       by[m.payment]=(by[m.payment]||0)-val;
@@ -2128,12 +2217,12 @@ function cashTotalsToday(){
     .filter(s=>!s.paymentPending&&todayKey(s.chargedAt||s.startedAt)===rmCashBusinessDayKey())
     .forEach(s=>{
       const amount=Number(s.basePrice||s.total||0);
-      if(s.paymentSplit&&Object.keys(s.paymentSplit).length)Object.entries(s.paymentSplit).forEach(([k,v])=>by[k]=(by[k]||0)+Number(v||0));
+      if(s.paymentSplit&&Object.keys(s.paymentSplit).length)Object.entries(villaSplitObject(s.paymentSplit)).forEach(([k,v])=>by[k]=(by[k]||0)+Number(v||0));
       else {const pay=s.payment||"";by[pay]=(by[pay]||0)+amount;}
     });
 
   db.sales.filter(s=>!s.paymentPending&&todayKey(s.at)===rmCashBusinessDayKey()).forEach(s=>{
-    if(s.paymentSplit&&Object.keys(s.paymentSplit).length)Object.entries(s.paymentSplit).forEach(([k,v])=>by[k]=(by[k]||0)+Number(v||0));
+    if(s.paymentSplit&&Object.keys(s.paymentSplit).length)Object.entries(villaSplitObject(s.paymentSplit)).forEach(([k,v])=>by[k]=(by[k]||0)+Number(v||0));
     else {const pay=s.payment||"";by[pay]=(by[pay]||0)+Number(s.total||0);}
   });
 
@@ -2143,9 +2232,9 @@ function cashTotalsToday(){
     .forEach(m=>{
       const amount=Number(m.amount||0);
       if(m.type==="payment_change"){
-        if(m.fromSplit&&Object.keys(m.fromSplit).length)Object.entries(m.fromSplit).forEach(([k,v])=>by[k]=(by[k]||0)-Number(v||0));
+        if(m.fromSplit&&Object.keys(m.fromSplit).length)Object.entries(villaSplitObject(m.fromSplit)).forEach(([k,v])=>by[k]=(by[k]||0)-Number(v||0));
         else if(m.fromPayment) by[m.fromPayment]=(by[m.fromPayment]||0)-amount;
-        if(m.toSplit&&Object.keys(m.toSplit).length)Object.entries(m.toSplit).forEach(([k,v])=>by[k]=(by[k]||0)+Number(v||0));
+        if(m.toSplit&&Object.keys(m.toSplit).length)Object.entries(villaSplitObject(m.toSplit)).forEach(([k,v])=>by[k]=(by[k]||0)+Number(v||0));
         else if(m.toPayment) by[m.toPayment]=(by[m.toPayment]||0)+amount;
       }else if(m.type==="refund"){
         if(m.payment) by[m.payment]=(by[m.payment]||0)-amount;
@@ -2580,7 +2669,35 @@ function rmParseMoneyInput(value){
   const n=Number(v);
   return Number.isFinite(n)?Math.max(0,n):0;
 }
+function rmValidateFinancialIntegrity(){
+  const allowed=new Set(['Pix','Dinheiro','Débito','Crédito','Cortesia']);
+  const errors=[];
+  const seen=new Set();
+  const records=[...(db.exits||[]),...(db.sales||[])];
+  records.forEach((r,i)=>{
+    if(!r)return;
+    const id=String(r.id||'');
+    if(id&&seen.has(id))errors.push('Registro financeiro duplicado: '+id);
+    if(id)seen.add(id);
+    if(r.paymentPending)return;
+    const total=Number(r.total||0);
+    if(!Number.isFinite(total)||total<0)errors.push('Valor inválido no registro '+(r.name||r.id||i));
+    if(r.paymentSplit){
+      const split=villaSplitObject(r.paymentSplit),sum=Object.values(split).reduce((a,v)=>a+Number(v||0),0);
+      Object.keys(split).forEach(k=>{if(!allowed.has(k))errors.push('Forma de pagamento desconhecida: '+k);});
+      if(Math.abs(sum-total)>.011)errors.push('Pagamento misto não fecha: '+(r.name||r.id||i)+' • '+money(sum)+' ≠ '+money(total));
+    }else if(r.payment && !allowed.has(villaNormalizePaymentName(r.payment)))errors.push('Forma de pagamento desconhecida: '+r.payment);
+  });
+  return errors;
+}
 function closeCashRegister(){
+  const integrityErrors=rmValidateFinancialIntegrity();
+  if(integrityErrors.length){
+    toast('🔒 Fechamento bloqueado: há inconsistências financeiras.');
+    console.error('Villa Kids — integridade financeira:',integrityErrors);
+    alert('O caixa não foi fechado porque o sistema encontrou inconsistências financeiras:\n\n• '+integrityErrors.slice(0,8).join('\n• ')+(integrityErrors.length>8?'\n• ...':'')+'\n\nCorrija os lançamentos antes de fechar.');
+    return;
+  }
   if(window.rmCanCloseCash && !rmCanCloseCash()){
     toast("🔒 Este caixa está sob responsabilidade de "+((db.cash&&db.cash.openedBy)||"outro usuário")+". Somente essa pessoa ou o ADM podem fechar.");
     return;
@@ -3813,6 +3930,10 @@ window.rmOpenSettingsMenu=function(){
     }
     const ids=pendingSelectedIds.slice();
     const starter=selectedStarterId;
+    const selectedForExit=ids.map(id=>(db.sessions||[]).find(x=>x.id===id)).filter(Boolean);
+    const selectedTotals=selectedForExit.map(s=>villaPriceFor(s,Date.now()).total);
+    groupSplit=villaSplitObject(groupSplit||{});
+    const groupAllocations=payment==='Mista'&&groupTotal>0?villaAllocateGroupSplit(groupSplit,selectedTotals):[];
 
     // Use existing exit calculation for each child individually.
     ids.forEach(function(id,idx){
@@ -3829,7 +3950,7 @@ window.rmOpenSettingsMenu=function(){
       s.chargedAt=now;
       s.exitedAt=now;
       s.payment=calc.total===0?"Cortesia":payment;
-      if(groupSplit&&groupTotal>0)s.paymentSplit=groupSplit.map(x=>({method:x.method,value:x.value*(calc.total/groupTotal)}));
+      if(groupSplit&&groupTotal>0)s.paymentSplit=groupAllocations[idx]||{};
       s.received=calc.total;
       s.exitedBy=(window.RECREAMOR_USUARIO_ATUAL&&window.RECREAMOR_USUARIO_ATUAL.nome)||"Não identificado";
       s.history=s.history||[];
