@@ -1325,7 +1325,7 @@ body{min-height:100vh!important;background:linear-gradient(180deg,#08a9d5 0%,#07
 </head>
 <body>
 <div class="villa-system-decor" aria-hidden="true"><span>☆</span><span>☁</span><span>☆</span><span>○</span><span>♢</span><span>☆</span><span>☁</span><span>☆</span></div>
-<div id="villaVersionBadge">V53</div>
+<div id="villaVersionBadge">V55</div>
 
 
 
@@ -1827,6 +1827,8 @@ function populatePagers(){
   if(!sel)return;
 
   let current=String(sel.value||'');
+  const preferred=String(window.rmEntryPreferredPager||'');
+  if(preferred) used.delete(preferred);
   sel.innerHTML='';
 
   let placeholder=document.createElement('option');
@@ -5459,25 +5461,38 @@ window.rmGetExtraChildren=function(){
     var entryBtn=[...document.querySelectorAll("button,a")].find(function(el){
       return /nova entrada|registrar entrada/i.test(el.textContent||"") && el.offsetParent!==null;
     });
+    window.rmEntryPreferredPager = s.pager!=null ? String(s.pager) : "";
     if(entryBtn) entryBtn.click();
     else if(typeof window.openEntry==="function") window.openEntry();
     else if(typeof window.rmOpenEntry==="function") window.rmOpenEntry();
 
     setTimeout(function(){
+      var form=document.getElementById("entryForm");
       var guardian=document.getElementById("guardianName");
       var cpf=document.getElementById("guardianCpf");
       var phone=document.getElementById("guardianPhone");
       var pager=document.getElementById("pagerSelect");
+      var child=document.getElementById("childName");
+      var birth=document.getElementById("childBirth");
+      var age=document.getElementById("childAge");
 
+      if(form){
+        form.dataset.customerId=s.customerId||"";
+        form.dataset.guardianCpfLoaded=(s.guardianCpf||"").replace(/\D/g,"");
+      }
       if(guardian) guardian.value=s.guardian||"";
-      if(cpf) cpf.value=s.guardianCpf||"";
+      if(cpf) { cpf.value=s.guardianCpf||""; if(window.rmValidateCpfField) rmValidateCpfField(false); }
       if(phone) phone.value=s.phone||"";
+      if(child) child.value="";
+      if(birth) birth.value="";
+      if(age) age.value="";
       if(pager && s.pager!=null) pager.value=String(s.pager);
 
-      /* cria imediatamente a Criança 2 usando o botão que já está funcionando */
+      /* abre um card vazio para cadastrar a nova criança no mesmo pager */
       var include=document.getElementById("rmIncludeChildBtn");
       if(include) include.click();
-    },120);
+      window.rmEntryPreferredPager="";
+    },160);
   };
 
   function inject(){
@@ -6059,7 +6074,7 @@ body{position:relative;isolation:isolate}
   }
 })();
 </script>
-<div id="villa-build-v26" style="position:fixed;right:7px;bottom:7px;z-index:9999;font:700 9px Arial;color:rgba(255,255,255,.7);pointer-events:none">V37</div>
+<div id="villa-build-v26" style="position:fixed;right:7px;bottom:7px;z-index:9999;font:700 9px Arial;color:rgba(255,255,255,.7);pointer-events:none">V55</div>
 
 <style id="villa-v22-report-preview-style">
 .rm-report-preview-dialog{width:min(560px,98vw)!important;max-height:96vh!important}
