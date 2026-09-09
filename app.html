@@ -3880,33 +3880,41 @@ window.rmOpenSettingsMenu=function(){
       const dh=modal.querySelector(".dialog-head");
       if(content && dh) dh.insertAdjacentElement("afterend",note);
 
-      // Multiple selected children are separate sessions. Show their combined fixed total.
+      // Multiple selected children: show EACH child's own calculation and one combined total.
+      // Never replace the first child's summary with the group total: each child keeps its own timer/value.
       const selectedSessions=pendingSelectedIds
         .map(id=>(db.sessions||[]).find(x=>x.id===id))
         .filter(Boolean);
-      const groupTotal=selectedSessions.reduce((sum,s)=>sum+villaPriceFor(s).total,0); window.villaGroupExitTotal=groupTotal; setTimeout(villaUpdateExitPayment,0);
-
-      const rows=[...modal.querySelectorAll(".summary-row,.row")];
-      rows.forEach(function(row){
-        const txt=(row.textContent||"").toLowerCase();
-        if(txt.includes("total")){
-          const vals=row.querySelectorAll("strong,b,span");
-          const target=vals.length?vals[vals.length-1]:null;
-          if(target) target.textContent=money(groupTotal);
-        }
+      const selectedCalcs=selectedSessions.map(function(ch){
+        const p=villaPriceFor(ch);
+        const paused=(ch.pausedMs||0)+(ch.status==='paused'?pauseElapsedMs(ch):0);
+        return {s:ch,p:p,paused:paused};
       });
+      const groupTotal=selectedCalcs.reduce((sum,item)=>sum+Number(item.p.total||0),0);
+      window.villaGroupExitTotal=groupTotal;
+      setTimeout(villaUpdateExitPayment,0);
 
-      // Fallback: locate the visible R$ total line by its label.
-      [...modal.querySelectorAll("*")].forEach(function(el){
-        if(el.children.length===0 && (el.textContent||"").trim()==="Total"){
-          const row=el.parentElement;
-          if(row){
-            const candidates=[...row.querySelectorAll("*")].filter(x=>x.children.length===0 && /R\$/.test(x.textContent||""));
-            if(candidates.length) candidates[candidates.length-1].textContent=money(groupTotal);
-          }
-        }
-      });
+      const groupSummary=
+        '<div class="banner" style="margin-bottom:10px">'+
+          '<strong>Total a pagar — '+pendingSelectedIds.length+' crianças</strong>'+
+          '<div style="font-size:24px;font-weight:900;margin-top:5px">'+money(groupTotal)+'</div>'+
+          '<div style="margin-top:5px;color:#66708a">Cada criança será calculada e encerrada separadamente.</div>'+
+        '</div>'+
+        selectedCalcs.map(function(item){
+          const ch=item.s,p=item.p;
+          return '<div class="banner" style="margin-bottom:10px">'+
+            '<strong>'+esc(ch.name||'')+' • Pager '+esc(String(ch.pager||''))+'</strong>'+
+            '<div style="margin-top:5px;color:#66708a">'+esc(villaDiscountName(ch.discountRate))+'</div>'+
+            '<div class="summary-line"><strong>Tempo contabilizado</strong><span>'+fmt(p.ms)+'</span></div>'+
+            '<div class="summary-line"><strong>Tempo em pausa</strong><span>'+fmt(item.paused)+'</span></div>'+
+            '<div class="summary-line"><strong>Valor pelo tempo</strong><span>'+money(p.gross)+'</span></div>'+
+            '<div class="summary-line"><strong>Desconto</strong><span>'+Math.round(p.rate*100)+'% • -'+money(p.discount)+'</span></div>'+
+            '<div class="summary-line"><strong>Total desta criança</strong><span><strong>'+money(p.total)+'</strong></span></div>'+
+          '</div>';
+        }).join('')+
+        '<div class="summary-line" style="font-size:20px;border-top:2px solid #ddd;margin-top:4px;padding-top:12px"><strong>TOTAL A PAGAR</strong><span><strong>'+money(groupTotal)+'</strong></span></div>';
 
+      document.getElementById('exitSummary').innerHTML=groupSummary;
       note.innerHTML="<strong>"+pendingSelectedIds.length+" crianças selecionadas</strong><div>Total das crianças selecionadas: <strong>"+money(groupTotal)+"</strong>. Pagamento será feito agora na saída.</div>";
     }
   };
@@ -6070,7 +6078,7 @@ body{position:relative;isolation:isolate}
   }
 })();
 </script>
-<div id="villa-build-v26" style="position:fixed;right:7px;bottom:7px;z-index:9999;font:700 9px Arial;color:rgba(255,255,255,.7);pointer-events:none">V60</div>
+<div id="villa-build-v26" style="position:fixed;right:7px;bottom:7px;z-index:9999;font:700 9px Arial;color:rgba(255,255,255,.7);pointer-events:none">V61</div>
 
 <style id="villa-v22-report-preview-style">
 .rm-report-preview-dialog{width:min(560px,98vw)!important;max-height:96vh!important}

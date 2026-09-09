@@ -1,4 +1,4 @@
-const CACHE_NAME = "villa-kids-v57-offline";
+const CACHE_NAME = "villa-kids-v61-offline";
 const APP_SHELL = [
   "./", "./index.html", "./app.html",
   "./configurar-equipe.html", "./convidados-festa.html", "./documentos-festa.html",
