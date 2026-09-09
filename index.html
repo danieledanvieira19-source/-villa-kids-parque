@@ -13,7 +13,7 @@
 </head><body>
 <div class="decor" aria-hidden="true"><span class="d1">☆</span><span class="d2">☁</span><span class="d3">☆</span><span class="d4">○</span><span class="d5">♢</span><span class="d6">☆</span></div>
 <form class="login" id="loginForm" autocomplete="on">
-<img class="logo" src="villa-kids-logo-transparente.png?v=51" alt="Villa Kids Parque">
+<img class="logo" src="villa-kids-logo-transparente.png?v=52" alt="Villa Kids Parque">
 <h1>Villa Kids Parque Sistema</h1><div class="subtitle">Controle e gestão do espaço infantil</div>
 <div class="field"><span class="ico">♙</span><input id="user" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Usuário" type="text"></div>
 <div class="field"><span class="ico">▣</span><input id="pass" autocomplete="current-password" placeholder="Senha" type="password"><button class="eye" id="eye" type="button" aria-label="Mostrar senha">◉</button></div>
@@ -36,9 +36,39 @@
       localStorage.setItem('villa_kids_cloud_token',body.token);
       if(body.user&&String(body.user.usuario||'').toLowerCase()==='admin')body.user.nome='Maria';
       localStorage.setItem('villa_kids_session',JSON.stringify(body.user));
+      // Store only a one-way verifier for offline login; never store the password itself.
+      try{
+        var data=new TextEncoder().encode('villa-kids-offline-v1|'+uu+'|'+pp);
+        var digest=await crypto.subtle.digest('SHA-256',data);
+        var bytes=new Uint8Array(digest), hex='';
+        for(var i=0;i<bytes.length;i++)hex+=bytes[i].toString(16).padStart(2,'0');
+        localStorage.setItem('villa_kids_offline_verifier',hex);
+      }catch(verifierErr){ console.warn('Villa offline verifier:',verifierErr); }
       localStorage.setItem('villa_kids_show_welcome','1');
-      location.replace('app.html?v=51');
-    }catch(err){m.textContent=(err&&err.message)||'Não foi possível conectar. Verifique a internet.';btn.disabled=false;btn.textContent=old;}
+      location.replace('app.html?v=52');
+    }catch(err){
+      // OFFLINE LOGIN: after at least one successful online login on this device,
+      // allow the same user to enter without internet using a local verifier.
+      try{
+        var cached=JSON.parse(localStorage.getItem('villa_kids_session')||'null');
+        var verifier=localStorage.getItem('villa_kids_offline_verifier')||'';
+        var cachedUser=String(cached&&cached.usuario||'').trim().toLowerCase();
+        if(cachedUser===uu && verifier){
+          var data=new TextEncoder().encode('villa-kids-offline-v1|'+uu+'|'+pp);
+          var digest=await crypto.subtle.digest('SHA-256',data);
+          var bytes=new Uint8Array(digest), hex='';
+          for(var i=0;i<bytes.length;i++)hex+=bytes[i].toString(16).padStart(2,'0');
+          if(hex===verifier){
+            localStorage.setItem('villa_kids_show_welcome','1');
+            m.textContent='Modo offline: acesso liberado.';
+            location.replace('app.html?v=52');
+            return false;
+          }
+        }
+      }catch(offlineErr){ console.warn('Villa offline login:',offlineErr); }
+      m.textContent='Sem internet. Para entrar offline, faça primeiro um login online neste aparelho.';
+      btn.disabled=false;btn.textContent=old;
+    }
     return false;
   };
 })();
