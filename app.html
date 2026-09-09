@@ -1179,7 +1179,7 @@ window.rmToggleUserMenu=function(e){if(e)e.stopPropagation();var d=document.getE
     return out;
   }
   function token(){try{return localStorage.getItem('villa_kids_cloud_token')||''}catch(e){return ''}}
-  function hardLogout(){try{localStorage.removeItem('villa_kids_cloud_token');localStorage.removeItem('villa_kids_session')}catch(e){} location.replace('index.html?v=52')}
+  function hardLogout(){try{localStorage.removeItem('villa_kids_cloud_token');localStorage.removeItem('villa_kids_session')}catch(e){} location.replace('index.html?v=53')}
   window.villaCloudApi=async function(action,payload){
     const headers={'Content-Type':'application/json','apikey':CFG.key};
     const t=token(); if(t)headers['x-villa-token']=t;
@@ -1325,7 +1325,7 @@ body{min-height:100vh!important;background:linear-gradient(180deg,#08a9d5 0%,#07
 </head>
 <body>
 <div class="villa-system-decor" aria-hidden="true"><span>☆</span><span>☁</span><span>☆</span><span>○</span><span>♢</span><span>☆</span><span>☁</span><span>☆</span></div>
-<div id="villaVersionBadge">V50</div>
+<div id="villaVersionBadge">V53</div>
 
 
 
@@ -6485,3 +6485,15 @@ body{position:relative;isolation:isolate}
   }
 }
 </style>
+
+<script>
+(function(){
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('./sw.js', {scope:'./'}).catch(function(err){
+        console.warn('Villa Kids offline service worker:', err);
+      });
+    });
+  }
+})();
+</script>
