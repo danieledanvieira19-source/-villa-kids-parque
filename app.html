@@ -1090,7 +1090,7 @@ body{background:radial-gradient(circle at 8% 8%,rgba(32,184,205,.22),transparent
 <!-- V9 LOGIN FIXO: logo embutida + cores Villa Kids + Safari -->
 
 
-<meta content="V59-PAUSA-RETORNO-SELECAO-OFFLINE-FINANCEIRO-BLINDADO" name="villa-kids-build"/><script id="villa-v12-local-bootstrap">
+<meta content="V60-PAUSA-RETORNO-SELECAO-OFFLINE-FINANCEIRO-BLINDADO" name="villa-kids-build"/><script id="villa-v12-local-bootstrap">
 window.RECREAMOR_CLOUD={enabled:false,supabaseUrl:"",supabaseKey:"",stateId:"villa-kids-local"};
 window.rmSupabase=null;
 (function(){
@@ -1325,7 +1325,7 @@ body{min-height:100vh!important;background:linear-gradient(180deg,#08a9d5 0%,#07
 </head>
 <body>
 <div class="villa-system-decor" aria-hidden="true"><span>☆</span><span>☁</span><span>☆</span><span>○</span><span>♢</span><span>☆</span><span>☁</span><span>☆</span></div>
-<div id="villaVersionBadge">V59</div>
+<div id="villaVersionBadge">V60</div>
 
 
 
@@ -1918,9 +1918,9 @@ e.target.reset();if(window.rmClearExtraChildren)rmClearExtraChildren();document.
 
 function pauseSession(id){let s=db.sessions.find(x=>x.id===id);if(!s||s.status!=='active')return;if(window.rmRequireRecordOwner&&!rmRequireRecordOwner(s))return;s.status='paused';s.pauseStarted=Date.now();s.pausedBy=(window.RECREAMOR_USUARIO_ATUAL&&window.RECREAMOR_USUARIO_ATUAL.nome)||'Não identificado';s.history=s.history||[];s.history.push({at:Date.now(),action:'Pausado',by:s.pausedBy});save();render();toast(`${s.name} foi pausada.`)}
 function returnSession(id){let s=db.sessions.find(x=>x.id===id);if(!s||s.status!=='paused')return;if(window.rmRequireRecordOwner&&!rmRequireRecordOwner(s))return;s.pausedMs+=(Date.now()-s.pauseStarted);s.pauseStarted=null;s.status='active';s.returnedBy=(window.RECREAMOR_USUARIO_ATUAL&&window.RECREAMOR_USUARIO_ATUAL.nome)||'Não identificado';s.history=s.history||[];s.history.push({at:Date.now(),action:'Retornado',by:s.returnedBy});save();render();toast(`${s.name} retornou ao atendimento.`)}
-function rmActionGroupSessions(s,list){if(!s)return [];if(s.groupId){let g=(db.sessions||[]).filter(x=>x.groupId===s.groupId&&list.includes(x));if(g.length)return g}return list.filter(x=>x.pager===s.pager&&Math.abs(Number(x.startedAt||0)-Number(s.startedAt||0))<5000)}
+function rmActionGroupSessions(s,list){if(!s)return [];const pool=(list||[]).filter(x=>x&&['active','paused'].includes(x.status));if(s.groupId){let g=pool.filter(x=>x.groupId===s.groupId);if(g.length)return g}const cpf=String(s.guardianCpf||'').replace(/\D/g,'');if(cpf){let g=pool.filter(x=>String(x.guardianCpf||'').replace(/\D/g,'')===cpf);if(g.length)return g}return pool.filter(x=>x.pager===s.pager&&Math.abs(Number(x.startedAt||0)-Number(s.startedAt||0))<5000)}
 function openActionGroupPicker(title,list,actionLabel,handler,id){const s=(db.sessions||[]).find(x=>x.id===id);if(!s){openPicker(title,list,actionLabel,handler);return}const group=rmActionGroupSessions(s,list);if(group.length<=1){closeModal('pickerModal');window[handler]?.(id);return}document.getElementById('pickerTitle').textContent=title;const el=document.getElementById('pickerList');el.innerHTML='<div class="banner"><strong>Pager '+esc(String(s.pager||''))+'</strong><div>Marque uma ou mais crianças para esta ação.</div></div>'+group.map(x=>`<label style="display:flex;align-items:center;gap:12px;padding:13px 10px;border-bottom:1px solid #ece8f4;cursor:pointer"><input type="checkbox" class="rm-action-check" value="${esc(x.id)}" style="width:20px;height:20px"><span><strong>${esc(x.name||'')}</strong><br><small>${x.status==='paused'?'Pausada':'Ativa'} • Pager ${esc(String(x.pager||''))}</small></span></label>`).join('')+`<button class="primary" type="button" onclick="${handler==='pickPause'?'rmConfirmActionGroup(\'pause\')':'rmConfirmActionGroup(\'return\')'}">${esc(actionLabel)} selecionadas</button>`;el.querySelector('.rm-action-check').checked=true;document.getElementById('pickerModal').classList.add('open')}
-function rmConfirmActionGroup(action){const ids=[...document.querySelectorAll('#pickerList .rm-action-check:checked')].map(x=>x.value);if(!ids.length){toast('Marque pelo menos uma criança.');return}closeModal('pickerModal');ids.forEach(id=>action==='pause'?pauseSession(id):returnSession(id));toast(ids.length===1?'Ação realizada.':`${ids.length} crianças: ação realizada.`)}
+function rmConfirmActionGroup(action){const ids=[...document.querySelectorAll('#pickerList .rm-action-check:checked')].map(x=>x.value);if(!ids.length){toast('Marque pelo menos uma criança.');return}closeModal('pickerModal');let changed=[];const by=(window.RECREAMOR_USUARIO_ATUAL&&window.RECREAMOR_USUARIO_ATUAL.nome)||'Não identificado';(db.sessions||[]).forEach(function(s){if(!ids.includes(String(s.id)))return;if(window.rmRequireRecordOwner&&!rmRequireRecordOwner(s))return;if(action==='pause'&&s.status==='active'){s.status='paused';s.pauseStarted=Date.now();s.pausedBy=by;s.history=s.history||[];s.history.push({at:Date.now(),action:'Pausado',by:by});s.updatedAt=Date.now();changed.push(s.name||'Criança')}else if(action==='return'&&s.status==='paused'){s.pausedMs=(s.pausedMs||0)+(Date.now()-Number(s.pauseStarted||Date.now()));s.pauseStarted=null;s.status='active';s.returnedBy=by;s.history=s.history||[];s.history.push({at:Date.now(),action:'Retornado',by:by});s.updatedAt=Date.now();changed.push(s.name||'Criança')}});if(changed.length){save();render();if(window.rmRenderMobile)rmRenderMobile();toast(changed.length===1?`${changed[0]} foi ${action==='pause'?'pausada':'retornou ao atendimento'}.`:`${changed.length} crianças: ação realizada.`)}else toast('Nenhuma criança pôde receber esta ação.')}
 function openPicker(title,list,actionLabel,handler){document.getElementById('pickerTitle').textContent=title;let el=document.getElementById('pickerList');el.innerHTML=list.length?list.map(s=>`<button class="secondary" onclick="${handler}('${s.id}')"><strong>${esc(s.name)}</strong> • Pager ${String(s.pager)}<br><small>${actionLabel}</small></button>`).join(''):'<div class="empty">Nenhuma criança disponível para esta ação.</div>';document.getElementById('pickerModal').classList.add('open')}
 function openPausePicker(){const list=db.sessions.filter(s=>s.status==='active');openPicker('Pausar Criança',list,'Pausar cronômetro','pickPause');}
 function pickPause(id){const s=(db.sessions||[]).find(x=>x.id===id),list=(db.sessions||[]).filter(x=>x.status==='active');if(s&&rmActionGroupSessions(s,list).length>1){openActionGroupPicker('Pausar Crianças',list,'Pausar cronômetro','pickPause',id);return}closeModal('pickerModal');pauseSession(id)}
@@ -3090,12 +3090,14 @@ window.rmCancelarCadastro = function(id){
     if(!s) return;
     document.getElementById("rmCancelMenuName").textContent=name||s.name||"Cadastro da criança";
     const action=document.getElementById("rmStatusActionBtn");
+    const actionList=(db.sessions||[]).filter(x=>x.status===s.status);
+    const actionGroup=rmActionGroupSessions(s,actionList);
     if(s.status==="paused"){
-      action.textContent="▶ Retornar criança";
-      action.onclick=function(){ returnSession(id); rmCloseCancelMenu(); };
+      action.textContent=actionGroup.length>1?"▶ Selecionar crianças para retornar":"▶ Retornar criança";
+      action.onclick=function(){ rmCloseCancelMenu(); if(actionGroup.length>1) openActionGroupPicker('Retornar Crianças',actionList,'Retomar cronômetro','pickReturn',id); else returnSession(id); };
     }else{
-      action.textContent="⏸ Pausar criança";
-      action.onclick=function(){ pauseSession(id); rmCloseCancelMenu(); };
+      action.textContent=actionGroup.length>1?"⏸ Selecionar crianças para pausar":"⏸ Pausar criança";
+      action.onclick=function(){ rmCloseCancelMenu(); if(actionGroup.length>1) openActionGroupPicker('Pausar Crianças',actionList,'Pausar cronômetro','pickPause',id); else pauseSession(id); };
     }
     const finish=document.getElementById("rmFinishBtn");
     if(finish){
@@ -3809,14 +3811,17 @@ window.rmOpenSettingsMenu=function(){
 
   function sameGroupSessions(s){
     if(!s) return [];
+    const pool=(db.sessions||[]).filter(x=>x&&['active','paused'].includes(x.status));
     if(s.groupId){
-      return (db.sessions||[]).filter(x=>x.groupId===s.groupId);
+      const g=pool.filter(x=>x.groupId===s.groupId);
+      if(g.length) return g;
     }
-    // Fallback for old records: same pager + near-identical start time.
-    return (db.sessions||[]).filter(x=>
-      x.pager===s.pager &&
-      Math.abs(Number(x.startedAt||0)-Number(s.startedAt||0)) < 5000
-    );
+    const cpf=String(s.guardianCpf||'').replace(/\D/g,'');
+    if(cpf){
+      const g=pool.filter(x=>String(x.guardianCpf||'').replace(/\D/g,'')===cpf);
+      if(g.length) return g;
+    }
+    return pool.filter(x=>x.pager===s.pager&&Math.abs(Number(x.startedAt||0)-Number(s.startedAt||0))<5000);
   }
 
   window.pickExit = function(id){
@@ -6065,7 +6070,7 @@ body{position:relative;isolation:isolate}
   }
 })();
 </script>
-<div id="villa-build-v26" style="position:fixed;right:7px;bottom:7px;z-index:9999;font:700 9px Arial;color:rgba(255,255,255,.7);pointer-events:none">V59</div>
+<div id="villa-build-v26" style="position:fixed;right:7px;bottom:7px;z-index:9999;font:700 9px Arial;color:rgba(255,255,255,.7);pointer-events:none">V60</div>
 
 <style id="villa-v22-report-preview-style">
 .rm-report-preview-dialog{width:min(560px,98vw)!important;max-height:96vh!important}
