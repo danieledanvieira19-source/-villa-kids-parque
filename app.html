@@ -5054,6 +5054,14 @@ window.rmReprintEntry=function(ref){
 <div class="field"><label>Nome do responsável</label><input id="rmEditChildGuardian"/></div>
 <div class="field"><label>CPF do responsável</label><input id="rmEditChildCpf"/></div>
 <div class="field"><label>Telefone do responsável</label><input id="rmEditChildPhone"/></div>
+<div id="rmEditIncludeChildrenBox" style="margin-top:14px;padding:14px;border:1.5px solid #ded0f7;border-radius:18px;background:#faf7ff">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px">
+    <strong style="color:#6e2bc6">👧 Incluir outra criança neste mesmo cadastro</strong>
+    <button type="button" id="rmEditAddChildBtn" class="secondary" style="width:auto;margin:0;padding:8px 12px">＋ Incluir</button>
+  </div>
+  <div id="rmEditExtraChildren"></div>
+  <small style="display:block;color:#777;margin-top:7px">A nova criança usará o mesmo responsável e o mesmo pager.</small>
+</div>
 <button class="primary" onclick="rmSaveChildEdit()">Salvar alterações</button>
 </div>
 </div>
@@ -5063,7 +5071,11 @@ window.rmReprintEntry=function(ref){
  function norm(v){return String(v||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim().toLowerCase()}
  function admin(){return window.rmIsAdmin?rmIsAdmin():["admin","administrador"].includes(norm(user().role))}
  function allowed(s){return admin()||norm(s.createdBy)===norm(user().nome)}
- window.rmOpenChildEdit=function(id){
+ function isSameActiveChildForEdit(x,name,birth){
+    var active=!!x && x.status!=='ended' && x.status!=='cancelled' && !x.endedAt && !x.cancelledAt;
+    return active && norm(x.name||x.child)===norm(name) && String(x.birth||'')===String(birth||'');
+  }
+   window.rmOpenChildEdit=function(id){
    var s=(db.sessions||[]).find(x=>String(x.id)===String(id));
    if(!s){toast("Cadastro não encontrado.");return}
    if(!allowed(s)){toast("🔒 Somente quem fez este cadastro ou o ADM pode editar os dados.");return}
@@ -5140,6 +5152,27 @@ window.rmReprintEntry=function(ref){
    s.updatedAt=Date.now(); s.updatedBy=user().nome||"Não identificado";
    s.history=s.history||[];s.history.push({at:Date.now(),action:"Dados da criança editados (incluindo pager/pacote/pagamento)",by:s.updatedBy});
 
+   // Novas crianças incluídas neste mesmo cadastro entram como novos atendimentos,
+   // compartilhando responsável e pager, sem sobrescrever a criança original.
+   var extras=(window.rmGetEditExtraChildren?rmGetEditExtraChildren():[]);
+   var extrasAdded=0;
+   extras.forEach(function(c){
+     var duplicate=(db.sessions||[]).some(function(x){
+       return isSameActiveChildForEdit(x,c.name,c.birth);
+     });
+     if(duplicate){toast('⚠️ A criança '+c.name+' já está no parquinho.');return}
+     var now=Date.now(), child={
+       id:uid(), name:c.name, birth:c.birth||'', age:c.birth?(typeof calcAge==='function'?calcAge(c.birth):''):'',
+       pager:s.pager, discountRate:Number(c.discountRate||0), discountType:villaDiscountName(Number(c.discountRate||0)),
+       basePrice:0, guardian:s.guardian||'', guardianCpf:s.guardianCpf||'', phone:s.phone||'', payment:'',
+       startedAt:now, chargedAt:null, total:0, pausedMs:0, pauseStarted:null, status:'active', updatedAt:now,
+       createdBy:user().nome||'Não identificado', groupId:s.groupId||('pager-'+String(s.pager)+'-'+String(s.startedAt||now)),
+       history:[{at:now,action:'Entrada registrada no mesmo cadastro/pager',by:user().nome||'Não identificado'}]
+     };
+     if(window.rmUpsertCustomerForSession)rmUpsertCustomerForSession(child);
+     db.sessions.push(child); extrasAdded++;
+   });
+
    // Keep customer/history records synchronized when they can be matched.
    (db.customers||[]).forEach(function(c){
      var linked=(s.customerId&&String(c.id)===String(s.customerId)) ||
@@ -5152,7 +5185,8 @@ window.rmReprintEntry=function(ref){
    });
    save();if(typeof render==="function")render();
    if(typeof renderCustomersList==="function")try{renderCustomersList()}catch(e){}
-   closeModal("rmEditChildModal");toast("Dados atualizados com sucesso.");
+   if(window.rmClearEditExtraChildren)rmClearEditExtraChildren();
+   closeModal("rmEditChildModal");toast(extrasAdded?"Dados atualizados e "+extrasAdded+" criança(s) incluída(s) no mesmo pager.":"Dados atualizados com sucesso.");
  };
 })();
 </script>
@@ -5437,92 +5471,41 @@ window.rmGetExtraChildren=function(){
   setTimeout(init,80);
 })();
 </script>
-<script id="rm-edit-include-children-v2">
+<script id="rm-edit-include-children-v3">
 (function(){
-  function fillFromCurrentEdit(){
+  function currentSession(){
     var idEl=document.getElementById("rmEditChildId");
     var id=idEl && idEl.value;
-    var s=(db.sessions||[]).find(function(x){return String(x.id)===String(id);});
-    return s||null;
+    return (db.sessions||[]).find(function(x){return String(x.id)===String(id);})||null;
   }
 
-  window.rmIncludeChildFromEdit=function(){
-    var s=fillFromCurrentEdit();
-    if(!s){toast("Cadastro da criança não encontrado.");return;}
-
-    /* fecha o editor se houver função/modal */
-    try{
-      var closeBtn=[...document.querySelectorAll("button")].find(function(b){
-        return /fechar|cancelar/i.test(b.textContent||"") && b.offsetParent!==null;
-      });
-      if(closeBtn) closeBtn.click();
-    }catch(e){}
-
-    /* abre Nova Entrada pelo botão já existente, sem alterar o fluxo principal */
-    var entryBtn=[...document.querySelectorAll("button,a")].find(function(el){
-      return /nova entrada|registrar entrada/i.test(el.textContent||"") && el.offsetParent!==null;
-    });
-    window.rmEntryPreferredPager = s.pager!=null ? String(s.pager) : "";
-    if(entryBtn) entryBtn.click();
-    else if(typeof window.openEntry==="function") window.openEntry();
-    else if(typeof window.rmOpenEntry==="function") window.rmOpenEntry();
-
-    setTimeout(function(){
-      var form=document.getElementById("entryForm");
-      var guardian=document.getElementById("guardianName");
-      var cpf=document.getElementById("guardianCpf");
-      var phone=document.getElementById("guardianPhone");
-      var pager=document.getElementById("pagerSelect");
-      var child=document.getElementById("childName");
-      var birth=document.getElementById("childBirth");
-      var age=document.getElementById("childAge");
-
-      if(form){
-        form.dataset.customerId=s.customerId||"";
-        form.dataset.guardianCpfLoaded=(s.guardianCpf||"").replace(/\D/g,"");
-      }
-      if(guardian) guardian.value=s.guardian||"";
-      if(cpf) { cpf.value=s.guardianCpf||""; if(window.rmValidateCpfField) rmValidateCpfField(false); }
-      if(phone) phone.value=s.phone||"";
-      if(child) child.value="";
-      if(birth) birth.value="";
-      if(age) age.value="";
-      if(pager && s.pager!=null) pager.value=String(s.pager);
-
-      /* A nova criança será digitada no campo principal. Não crie um card vazio: isso fazia
-         o navegador bloquear o envio por childName obrigatório e impedia a inclusão. */
-      if(child){
-        child.value="";
-        child.removeAttribute("data-active-guard-hit");
-        child.focus();
-      }
-      window.rmEntryPreferredPager="";
-    },160);
-  };
-
-  function inject(){
-    var save=[...document.querySelectorAll("button")].find(function(b){
-      return /salvar alterações/i.test(b.textContent||"") && b.offsetParent!==null;
-    });
-    if(!save)return;
-
-    var container=save.parentElement;
-    if(!container || container.querySelector("#rmEditIncludeChildrenBtn"))return;
-
-    var btn=document.createElement("button");
-    btn.id="rmEditIncludeChildrenBtn";
-    btn.type="button";
-    btn.className="secondary";
-    btn.textContent="Incluir + crianças";
-    btn.style.width="100%";
-    btn.style.margin="8px 0 10px";
-    btn.onclick=window.rmIncludeChildFromEdit;
-    container.insertBefore(btn,save);
+  function card(){
+    var holder=document.getElementById("rmEditExtraChildren");
+    if(!holder)return;
+    var n=holder.querySelectorAll('.rm-edit-extra-child').length+2;
+    var row=document.createElement('div');
+    row.className='rm-edit-extra-child';
+    row.style.cssText='border:1.5px solid #ded0f7;border-radius:14px;padding:12px;margin-top:10px;background:#fff;';
+    row.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px"><strong style="color:#6e2bc6">Criança '+n+'</strong><button type="button" class="rm-edit-extra-remove" style="border:0;background:#ffe8ef;color:#bd3157;border-radius:10px;padding:6px 9px;font-weight:800">Remover</button></div>'
+      +'<div class="grid2">'
+      +'<div class="field" style="margin:0"><label>Nome da criança</label><input class="rm-edit-extra-name" required placeholder="Digite o nome"></div>'
+      +'<div class="field" style="margin:0"><label>Data de nascimento (opcional)</label><input class="rm-edit-extra-birth" type="date"></div>'
+      +'</div>'
+      +'<div class="field" style="margin:10px 0 0"><label>Categoria / desconto</label><select class="rm-edit-extra-package"><option value="0">Padrão</option><option value="0.05">Irmãos — 5%</option><option value="0.10">Food Park — 10%</option><option value="0.50">PCD — 50%</option><option value="1">Cortesia — 100%</option></select></div>'
+      +'<small class="rm-edit-extra-age" style="display:block;color:#6e2bc6;font-weight:800;margin-top:6px"></small>';
+    holder.appendChild(row);
+    var birth=row.querySelector('.rm-edit-extra-birth'), age=row.querySelector('.rm-edit-extra-age');
+    function upd(){try{age.textContent=birth.value?'🎂 Idade: '+calcAge(birth.value)+' anos':''}catch(e){age.textContent=''}}
+    birth.addEventListener('input',upd); birth.addEventListener('change',upd);
+    row.querySelector('.rm-edit-extra-remove').onclick=function(){row.remove();renumber()};
+    row.querySelector('.rm-edit-extra-name').focus();
   }
-
-  document.addEventListener("DOMContentLoaded",inject);
-  new MutationObserver(inject).observe(document.documentElement,{childList:true,subtree:true});
-  setTimeout(inject,100);
+  function renumber(){document.querySelectorAll('#rmEditExtraChildren .rm-edit-extra-child').forEach(function(r,i){var t=r.querySelector('strong');if(t)t.textContent='Criança '+(i+2)})}
+  window.rmEditAddChild=card;
+  function inject(){var b=document.getElementById('rmEditAddChildBtn');if(b&&!b.dataset.bound){b.dataset.bound='1';b.onclick=card}}
+  document.addEventListener('DOMContentLoaded',inject); setTimeout(inject,100);
+  window.rmGetEditExtraChildren=function(){return Array.from(document.querySelectorAll('#rmEditExtraChildren .rm-edit-extra-child')).map(function(r){return {name:(r.querySelector('.rm-edit-extra-name')?.value||'').trim(),birth:r.querySelector('.rm-edit-extra-birth')?.value||'',discountRate:Number(r.querySelector('.rm-edit-extra-package')?.value||0)}}).filter(function(x){return x.name})};
+  window.rmClearEditExtraChildren=function(){var h=document.getElementById('rmEditExtraChildren');if(h)h.innerHTML=''};
 })();
 </script>
 <script id="rm-active-guard">
