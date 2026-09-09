@@ -1090,7 +1090,7 @@ body{background:radial-gradient(circle at 8% 8%,rgba(32,184,205,.22),transparent
 <!-- V9 LOGIN FIXO: logo embutida + cores Villa Kids + Safari -->
 
 
-<meta content="V60-PAUSA-RETORNO-SELECAO-OFFLINE-FINANCEIRO-BLINDADO" name="villa-kids-build"/><script id="villa-v12-local-bootstrap">
+<meta content="V62-CANCELAMENTO-PERSISTENTE-OFFLINE-FINANCEIRO-BLINDADO" name="villa-kids-build"/><script id="villa-v12-local-bootstrap">
 window.RECREAMOR_CLOUD={enabled:false,supabaseUrl:"",supabaseKey:"",stateId:"villa-kids-local"};
 window.rmSupabase=null;
 (function(){
@@ -1150,7 +1150,23 @@ window.rmToggleUserMenu=function(e){if(e)e.stopPropagation();var d=document.getE
     const ids=new Set([...lm.keys(),...rm.keys(),...bm.keys()]); const out=[];
     ids.forEach(id=>{
       const l=lm.get(id), r=rm.get(id), b=bm.get(id);
+      // A record that existed in the last synchronized baseline but was deliberately
+      // removed locally is a tombstone/deletion. Do not resurrect it from the cloud.
+      // This is essential when a session is cancelled or moved from sessions -> exits.
+      if(b){
+        if(!l && r){
+          // Local deletion wins. If the remote copy is newer, it can still be
+          // intentionally removed by the next explicit operation rather than resurrected.
+          return;
+        }
+        if(l && !r){
+          const lc=!same(l,b);
+          if(lc) out.push(l);
+          return;
+        }
+      }
       if(l&&!r){out.push(l);return} if(!l&&r){out.push(r);return}
+      if(!l&&!r)return;
       const lc=!!l&&!same(l,b), rc=!!r&&!same(r,b);
       if(lc&&!rc){out.push(l);return} if(!lc&&rc){out.push(r);return}
       if(!lc&&!rc){out.push(r||l);return}
@@ -1325,7 +1341,7 @@ body{min-height:100vh!important;background:linear-gradient(180deg,#08a9d5 0%,#07
 </head>
 <body>
 <div class="villa-system-decor" aria-hidden="true"><span>☆</span><span>☁</span><span>☆</span><span>○</span><span>♢</span><span>☆</span><span>☁</span><span>☆</span></div>
-<div id="villaVersionBadge">V60</div>
+<div id="villaVersionBadge">V62</div>
 
 
 
@@ -6078,7 +6094,7 @@ body{position:relative;isolation:isolate}
   }
 })();
 </script>
-<div id="villa-build-v26" style="position:fixed;right:7px;bottom:7px;z-index:9999;font:700 9px Arial;color:rgba(255,255,255,.7);pointer-events:none">V61</div>
+<div id="villa-build-v26" style="position:fixed;right:7px;bottom:7px;z-index:9999;font:700 9px Arial;color:rgba(255,255,255,.7);pointer-events:none">V62</div>
 
 <style id="villa-v22-report-preview-style">
 .rm-report-preview-dialog{width:min(560px,98vw)!important;max-height:96vh!important}
